@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fahrrad App</string>
+    <string name="login_button">Einloggen</string>
+    <string name="login_google_button">Einloggen mit Google</string>
+    <string name="create_button">Erstelle einen Account</string>
+    <string name="password">Passwort</string>
+    <string name="username">Benutzername</string>
+</resources>
