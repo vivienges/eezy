@@ -13,7 +13,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.common.SignInButton
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
 
 
 class LoginActivity : AppCompatActivity() {
@@ -22,12 +26,14 @@ class LoginActivity : AppCompatActivity() {
     lateinit var mGoogleSignInClient: GoogleSignInClient
     lateinit var mGoogleSignInOptions: GoogleSignInOptions
 
+   // private lateinit var firebaseAuth: FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
 
-        val googleSignIn = findViewById<Button>(R.id.sign_in_button)
+        val googleSignIn = findViewById<SignInButton>(R.id.sign_in_button)
 
 
 
@@ -40,11 +46,11 @@ class LoginActivity : AppCompatActivity() {
             mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
 
-        fun setupUI() {
-            googleSignIn.setOnClickListener {
 
+            googleSignIn.setOnClickListener {
+                signIn()
             }
-        }
+
 
 
         val createAccount = findViewById<Button>(R.id.createAccount)
@@ -58,6 +64,19 @@ class LoginActivity : AppCompatActivity() {
 
 
         }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == RC_SIGN_IN) {
+            val task: Task<GoogleSignInAccount> = GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+
+            } catch (e: ApiException) {
+                Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
 
     private fun signIn() {
         val signInIntent: Intent = mGoogleSignInClient.signInIntent
