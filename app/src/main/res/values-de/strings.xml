@@ -13,4 +13,6 @@
     <string name="complete_signup">Anmeldung abschließen</string>
     <string name="rent_bike">Fahrrad leihen</string>
     <string name="reserve_bike">Fahrrad reservieren</string>
+    <string name="sign_in_option">Noch keinen Account?</string>
+    <string name="title_activity_maps">Karte</string>
 </resources>
