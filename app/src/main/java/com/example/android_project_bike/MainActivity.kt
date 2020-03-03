@@ -13,11 +13,21 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import kotlinx.android.synthetic.main.fragment_map.*
+import android.content.Context
+import android.util.Log
+import androidx.multidex.MultiDex
+import com.google.firebase.firestore.FirebaseFirestore
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
     lateinit var mMap: GoogleMap
     lateinit var adapter : ArrayAdapter<Bike>
+
+    // Set up multidex for this activity
+    override fun attachBaseContext(base: Context) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,5 +74,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
         val sydney = LatLng(-34.0, 151.0)
         mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
     }
 }
