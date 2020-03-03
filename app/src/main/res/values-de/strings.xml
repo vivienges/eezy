@@ -3,7 +3,16 @@
     <string name="app_name">Fahrrad App</string>
     <string name="login_button">Einloggen</string>
     <string name="login_google_button">Einloggen mit Google</string>
-    <string name="create_button">Erstelle einen Account</string>
+    <string name="create_account">Erstelle einen Account</string>
     <string name="password">Passwort</string>
     <string name="username">Benutzername</string>
+    <string name="email">Email</string>
+    <string name="confirm_password">Passwort bestätigen</string>
+    <string name="add_payment">Bezahlungsart hinzufügen</string>
+    <string name="select_bike_button">Fahrrad wählen</string>
+    <string name="complete_signup">Anmeldung abschließen</string>
+    <string name="rent_bike">Fahrrad leihen</string>
+    <string name="reserve_bike">Fahrrad reservieren</string>
+    <string name="sign_in_option">Noch keinen Account?</string>
+    <string name="title_activity_maps">Karte</string>
 </resources>
