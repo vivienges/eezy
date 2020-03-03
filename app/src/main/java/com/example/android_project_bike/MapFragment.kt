@@ -40,6 +40,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap?) {
 map?.let {
     googleMap = it
+
 }
     }
 
