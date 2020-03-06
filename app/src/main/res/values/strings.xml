@@ -11,6 +11,10 @@
     <string name="reserve_bike">Reserve Bike</string>
     <string name="sign_in_option">Don\'t have an account?</string>
     <string name="title_activity_maps">Map</string>
-
+    <string name="current_distance">Current distance:</string>
+    <string name="current_price">Current price:</string>
+    <string name="battery_level">Battery level:</string>
+    <string name="bike">Bike</string>
+    <string name="history">History</string>
 </resources>
 
