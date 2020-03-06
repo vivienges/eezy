@@ -15,4 +15,9 @@
     <string name="reserve_bike">Fahrrad reservieren</string>
     <string name="sign_in_option">Noch keinen Account?</string>
     <string name="title_activity_maps">Karte</string>
+    <string name="current_distance">Bisherige Strecke:</string>
+    <string name="current_price">Aktueller Preis:</string>
+    <string name="battery_level">Akkustand:</string>
+    <string name="bike">Fahrrad</string>
+    <string name="history">Vergangene Fahrten</string>
 </resources>
