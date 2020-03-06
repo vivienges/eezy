@@ -1,21 +1,16 @@
 <resources>
     <string name="app_name">Bike App</string>
     <string name="login_button">Login</string>
-    <string name="login_google_button">Login with Google</string>
     <string name="create_account">Create Account</string>
     <string name="password">Password</string>
-    <string name="username">Username</string>
-    <string name="email">Email</string>
-    <string name="confirm_password">Confirm password</string>
+    <string name="mail">Mail</string>
+    <string name="confirm_password">Confirm Password</string>
     <string name="add_payment">Add Payment Method</string>
-    <string name="select_bike_button">Select Bike</string>
-    <string name="complete_signup">Complete Sign-Up</string>
+    <string name="complete_signup">Complete Sign Up</string>
     <string name="rent_bike">Rent Bike</string>
     <string name="reserve_bike">Reserve Bike</string>
     <string name="sign_in_option">Don\'t have an account?</string>
     <string name="title_activity_maps">Map</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
 

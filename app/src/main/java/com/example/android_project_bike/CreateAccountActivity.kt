@@ -8,7 +8,6 @@ import android.text.TextWatcher
 import android.util.Patterns
 import android.widget.Button
 import android.widget.EditText
-import kotlinx.android.synthetic.main.activity_create_account.*
 
 class CreateAccountActivity : AppCompatActivity() {
 
@@ -17,27 +16,31 @@ class CreateAccountActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_account)
 
-        val editEmail = findViewById<EditText>(R.id.email)
-        val addPaymentButton = findViewById<Button>(R.id.addPayment)
-        val editPassword = findViewById<EditText>(R.id.password)
-        val passwordConfirmation = findViewById<EditText>(R.id.passwordConfirmation)
+        val editMail = findViewById<EditText>(R.id.mail_input)
+        val addPaymentButton = findViewById<Button>(R.id.add_payment_button)
+        val editPassword = findViewById<EditText>(R.id.password_input)
+        val passwordConfirmation = findViewById<EditText>(R.id.confirmed_password_input)
 
 
-        editEmail.addTextChangedListener(object : TextWatcher {
+        //TODO: Check if email already exists
+        //TODO: Check if password is the same
+        //TODO: Hash password
+
+        editMail.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
 
 
-                val emailInput = editEmail.editableText.toString().trim()
+                val emailInput = editMail.editableText.toString().trim()
 
                 if (emailInput.isEmpty()) {
-                    editEmail.setError("Field can't be empty")
+                    editMail.setError("Field can't be empty")
                 }
 
                 else if(!Patterns.EMAIL_ADDRESS.matcher(emailInput).matches()) {
-                    editEmail.setError("Input is not a valid email")
+                    editMail.setError("Input is not a valid email")
                 }
                 else {
-                    editEmail.setError(null)
+                    editMail.setError(null)
 
 
 
@@ -56,7 +59,7 @@ class CreateAccountActivity : AppCompatActivity() {
                     })
 
 
-        val addPayment = findViewById<Button>(R.id.addPayment)
+        val addPayment = findViewById<Button>(R.id.add_payment_button)
 
         addPayment.setOnClickListener {
 
