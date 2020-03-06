@@ -27,20 +27,20 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
-            android:id="@+id/radio_one"
+            android:id="@+id/paypal_radio"
             android:layout_width="match_parent"
             android:layout_height="131dp"
-            android:text="Paypal"
-            android:checked="true"/>
+            android:checked="true"
+            android:text="PayPal" />
 
         <RadioButton
-            android:id="@+id/radio_two"
+            android:id="@+id/credit_card_radio"
             android:layout_width="match_parent"
             android:layout_height="139dp"
             android:text="Credit Card" />
 
         <RadioButton
-            android:id="@+id/radio_three"
+            android:id="@+id/google_pay_radio"
             android:layout_width="match_parent"
             android:layout_height="157dp"
             android:text="Google Pay" />

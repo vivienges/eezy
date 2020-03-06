@@ -1,6 +1,6 @@
 package com.example.android_project_bike
 
-val bikeRepository = BikeRepository().apply {
+ /*val bikeRepository = BikeRepository().apply {
 
     addBike(
         100,
@@ -61,4 +61,4 @@ class BikeRepository {
             latitude = newLatitude
         }
     }
-}
+} */

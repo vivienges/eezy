@@ -16,12 +16,36 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import android.content.Context
 import android.util.Log
 import androidx.multidex.MultiDex
+import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.android.synthetic.main.activity_main.*
+import com.google.android.gms.maps.CameraUpdate
+import com.google.android.gms.maps.model.CameraPosition
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import com.google.android.gms.maps.model.Marker
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
+
+
+
+
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
-    lateinit var mMap: GoogleMap
-    lateinit var adapter : ArrayAdapter<Bike>
+    private lateinit var mMap: GoogleMap
+    lateinit var adapter : ArrayAdapter<String>
+
+    private var idList= mutableListOf<String>()
+
+    private var db = FirebaseFirestore.getInstance()
+    private var bikes = db.collection("bikes")
+
 
     // Set up multidex for this activity
     override fun attachBaseContext(base: Context) {
@@ -34,46 +58,112 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
         setContentView(R.layout.activity_main)
 
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as? SupportMapFragment
+            .findFragmentById(R.id.map_fragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
+        idList = mutableListOf()
         val listView = findViewById<ListView>(R.id.list_view)
+
         adapter = ArrayAdapter(
             applicationContext,
             android.R.layout.simple_list_item_1,
             android.R.id.text1,
-            bikeRepository.getAllBikes()
+            idList
+
         )
 
         listView.adapter = adapter
+
+
         val loggedIn = true
 
         listView.setOnItemClickListener { parent, view, position, id ->
-            val listItemId =  listView.adapter.getItemId(position+1).toInt()
+            val itemText = listView.getItemAtPosition(position).toString()
 
-            if (loggedIn != false) {
+            if (loggedIn != true) {
 
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
                 startActivity(intent)
 
             } else {
 
-             /*   val intent = Intent(this@MainActivity, BikeDetailActivity::class.java)
-                intent.putExtra("id", listItemId)
-                startActivity(intent) */
+                val intent = Intent(this@MainActivity, BikeDetailsActivity::class.java)
+
+                intent.putExtra(EXTRA_BIKE_ID, itemText)
+                startActivity(intent)
 
             }
 
         }
+
+
     }
+
+    override fun onStart() {
+        super.onStart()
+        db.collection("bikes")
+            .get()
+            .addOnSuccessListener { result ->
+                var dataChanged = false
+                for (document in result) {
+                    if (document.id !in idList) {
+                        idList.add(document.id)
+                        dataChanged = true
+                    }
+                    if (dataChanged) {
+                        adapter.notifyDataSetChanged()
+                    }
+                    Log.d("SUCCESS", "${document.id} => ${document.data}")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("ERROR", "Error getting documents: ", exception)
+            }
+    }
+    companion object {
+        const val EXTRA_BIKE_ID = "BIKE_ID"
+    }
+
 
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
 
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        val jonkoping = LatLng(57.778767, 14.163388)
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jonkoping, 12F))
+
+        db.collection("bikes")
+            .get()
+            .addOnSuccessListener { result ->
+                var dataChanged = false
+                for (document in result) {
+                    if (document != null) {
+                        Log.d("SUCCESS", "DocumentSnapshot data: ${document.data}")
+                        val bike = document.toObject(Bike::class.java)
+
+                        val position = LatLng(bike.position.latitude, bike.position.longitude)
+                        mMap.addMarker(MarkerOptions().position(position).title("Bike $document.data.id"))
+
+
+
+
+                        dataChanged = true
+                    }
+                    else {
+                        Log.d("ERROR", "No such document")
+                    }
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("ERROR", "get failed with ", exception)
+            }
+
+
+
+
+
+
+
 
     }
 }

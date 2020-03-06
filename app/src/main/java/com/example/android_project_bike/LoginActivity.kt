@@ -13,6 +13,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.SignInButton
@@ -35,7 +36,8 @@ class LoginActivity : AppCompatActivity() {
 
         val googleSignIn = findViewById<SignInButton>(R.id.sign_in_button)
 
-
+        val textView = googleSignIn.getChildAt(0) as TextView
+        textView.text = "LOGIN"
 
 
             val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -50,6 +52,8 @@ class LoginActivity : AppCompatActivity() {
             googleSignIn.setOnClickListener {
                 signIn()
             }
+
+
 
 
 
