@@ -29,20 +29,19 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.android.gms.maps.model.Marker
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
-
-
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
     private lateinit var mMap: GoogleMap
-    lateinit var adapter : ArrayAdapter<String>
+    private lateinit var auth: FirebaseAuth
+    private lateinit var adapter : ArrayAdapter<String>
 
     private var idList= mutableListOf<String>()
 
+    private var loggedIn = false
     private var db = FirebaseFirestore.getInstance()
     private var bikes = db.collection("bikes")
 
@@ -56,6 +55,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        auth = FirebaseAuth.getInstance()
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
@@ -74,8 +75,8 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
         listView.adapter = adapter
 
-
-        val loggedIn = true
+        val currentUser = auth.currentUser
+        loggedIn = currentUser != null
 
         listView.setOnItemClickListener { parent, view, position, id ->
             val itemText = listView.getItemAtPosition(position).toString()
@@ -101,6 +102,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
     override fun onStart() {
         super.onStart()
+
+        val currentUser = auth.currentUser
+        loggedIn = currentUser != null
+
         db.collection("bikes")
             .get()
             .addOnSuccessListener { result ->
@@ -140,7 +145,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
                     if (document != null) {
                         Log.d("SUCCESS", "DocumentSnapshot data: ${document.data}")
                         val bike = document.toObject(Bike::class.java)
-
                         val position = LatLng(bike.position.latitude, bike.position.longitude)
                         mMap.addMarker(MarkerOptions().position(position).title("Bike $document.data.id"))
 
