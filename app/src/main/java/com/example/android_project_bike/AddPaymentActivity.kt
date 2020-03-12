@@ -81,7 +81,7 @@ class AddPaymentActivity : AppCompatActivity() {
                         val userInfo = hashMapOf(
                             "email" to user.email,
                             "payment" to payment,
-                            "history" to historyDocument.id
+                            "history" to historyDocument
                         )
                         userDocument.set(userInfo)
                             .addOnSuccessListener { result ->
