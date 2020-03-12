@@ -93,7 +93,9 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="RETURN BIKE" />
+                android:text="RETURN BIKE"
+                android:background="@drawable/custom_button_states"
+                android:textColor="#ffffff"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,11 +7,12 @@ data class Bike (
     var charge: Int,
     var available: Boolean,
     var locked: Boolean,
-    var position: GeoPoint
+    var position: GeoPoint,
+    var current_user: String
 )
 
 {
-    constructor() : this(0, 0, true, true, GeoPoint(0.0, 0.0)) {
+    constructor() : this(0, 0, true, true, GeoPoint(0.0, 0.0), "") {
 
     }
 

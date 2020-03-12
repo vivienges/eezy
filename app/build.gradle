@@ -49,4 +49,5 @@ dependencies {
     // Set dependency for multidex:
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-database:16.0.6'
+    implementation 'com.google.firebase:firebase-auth:19.2.0'
 }

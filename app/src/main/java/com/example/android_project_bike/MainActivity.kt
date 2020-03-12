@@ -29,22 +29,19 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.android.gms.maps.model.Marker
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
-
-
-
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
+    private var db = FirebaseFirestore.getInstance()
+    private lateinit var auth: FirebaseAuth
     private lateinit var mMap: GoogleMap
     lateinit var adapter : ArrayAdapter<String>
-
     private var idList= mutableListOf<String>()
-
-    private var db = FirebaseFirestore.getInstance()
-    private var bikes = db.collection("bikes")
+    lateinit var bike: Bike
+    private var loggedIn = false
 
 
     // Set up multidex for this activity
@@ -56,6 +53,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        auth = FirebaseAuth.getInstance()
+
+        bike = Bike()
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
@@ -69,60 +70,70 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
             android.R.layout.simple_list_item_1,
             android.R.id.text1,
             idList
-
         )
 
         listView.adapter = adapter
 
+        db.collection("bikes")
+            .addSnapshotListener { snapshots, e ->
+                if (e == null && snapshots != null)
+                //TODO: Add error handling
+                    for (documentChange in snapshots!!.documentChanges) {
+                        when (documentChange.type) {
+                            DocumentChange.Type.ADDED -> {
+                                idList.add("Bike " + documentChange.document.id)
 
-        val loggedIn = true
+                                bike = documentChange.document.toObject(Bike::class.java)
+
+                                val position =
+                                    LatLng(bike.position.latitude, bike.position.longitude)
+                                mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document}.data.id"))
+                            }
+                            DocumentChange.Type.REMOVED ->
+                                idList.remove("Bike " + documentChange.document.id)
+                        }
+                    }
+                adapter.notifyDataSetChanged()
+            }
+
+
+        var bundle = Bundle()
 
         listView.setOnItemClickListener { parent, view, position, id ->
-            val itemText = listView.getItemAtPosition(position).toString()
+
+
+            val itemText = listView.getItemAtPosition(position).toString().replace("[^0-9]".toRegex(), "")
+
+
+            bundle.putString("bikeId", itemText)
 
             if (loggedIn != true) {
 
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                intent.putExtra("bundle", bundle)
                 startActivity(intent)
 
             } else {
 
                 val intent = Intent(this@MainActivity, BikeDetailsActivity::class.java)
 
-                intent.putExtra(EXTRA_BIKE_ID, itemText)
+                intent.putExtra("bundle", bundle)
                 startActivity(intent)
 
             }
 
         }
-
-
     }
 
-    override fun onStart() {
-        super.onStart()
-        db.collection("bikes")
-            .get()
-            .addOnSuccessListener { result ->
-                var dataChanged = false
-                for (document in result) {
-                    if (document.id !in idList) {
-                        idList.add(document.id)
-                        dataChanged = true
-                    }
-                    if (dataChanged) {
-                        adapter.notifyDataSetChanged()
-                    }
-                    Log.d("SUCCESS", "${document.id} => ${document.data}")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("ERROR", "Error getting documents: ", exception)
-            }
+    override fun onRestart() {
+        super.onRestart()
+
+        val currentUser = auth.currentUser
+        loggedIn = currentUser != null
+
+        adapter.notifyDataSetChanged()
     }
-    companion object {
-        const val EXTRA_BIKE_ID = "BIKE_ID"
-    }
+
 
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -132,38 +143,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
         val jonkoping = LatLng(57.778767, 14.163388)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jonkoping, 12F))
 
-        db.collection("bikes")
-            .get()
-            .addOnSuccessListener { result ->
-                var dataChanged = false
-                for (document in result) {
-                    if (document != null) {
-                        Log.d("SUCCESS", "DocumentSnapshot data: ${document.data}")
-                        val bike = document.toObject(Bike::class.java)
-
-                        val position = LatLng(bike.position.latitude, bike.position.longitude)
-                        mMap.addMarker(MarkerOptions().position(position).title("Bike $document.data.id"))
-
-
-
-
-                        dataChanged = true
-                    }
-                    else {
-                        Log.d("ERROR", "No such document")
-                    }
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("ERROR", "get failed with ", exception)
-            }
-
-
-
-
-
-
 
 
     }
+    companion object {
+        const val EXTRA_BIKE_ID = "BIKE_ID"
+    }
 }
+
+

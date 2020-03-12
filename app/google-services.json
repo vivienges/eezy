@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "292430996001-uuhbr615uu5djh0naan9iudseur5gphu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.android_project_bike",
+            "certificate_hash": "89df0ae5dc9dfbb91baea3a5c35a369f1d8b9bd9"
+          }
+        },
+        {
           "client_id": "292430996001-vft1uu37nfb7vc7vu0tef2ibjevrkdnb.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -13,12 +13,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.util.Log
+import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.common.SignInButton
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
 
 
 class LoginActivity : AppCompatActivity() {
@@ -26,12 +29,56 @@ class LoginActivity : AppCompatActivity() {
     val RC_SIGN_IN: Int = 1
     lateinit var mGoogleSignInClient: GoogleSignInClient
     lateinit var mGoogleSignInOptions: GoogleSignInOptions
+    private lateinit var auth: FirebaseAuth
+    private var loggedIn = false
 
-   // private lateinit var firebaseAuth: FirebaseAuth
+
+
+
+    // private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        auth = FirebaseAuth.getInstance()
+
+        val intent = intent
+        val bundle = intent.getBundleExtra("bundle")
+
+
+
+        val login_button = findViewById<Button>(R.id.login_button)
+
+        login_button.setOnClickListener() {
+
+            var email = findViewById<EditText>(R.id.email_login).editableText.toString()
+
+            var password = findViewById<EditText>(R.id.password_login).editableText.toString()
+
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this){ task ->
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Log.d("SUCCESS", "signInWithEmail:success")
+                        val user = auth.currentUser
+                        loggedIn = user != null
+
+                        val intent = Intent(this, BikeDetailsActivity::class.java)
+                        intent.putExtra("bundle", bundle)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.w("FAIL", "signInWithEmail:failure", task.exception)
+                        Toast.makeText(baseContext, "Authentication failed.",
+                            Toast.LENGTH_SHORT).show()
+                    }
+
+                }
+
+
+        }
 
 
         val googleSignIn = findViewById<SignInButton>(R.id.sign_in_button)
@@ -62,6 +109,7 @@ class LoginActivity : AppCompatActivity() {
         createAccount.setOnClickListener {
 
             val intent = Intent(this, CreateAccountActivity::class.java)
+            intent.putExtra("bundle", bundle)
             startActivity(intent)
         }
 
