@@ -4,31 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fillViewport="true"
     tools:context=".BikeDetailsActivity"
     >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:orientation="vertical">
+
     <fragment
         android:id="@+id/map_fragment"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="400sp"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/bike_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bike XX"></TextView>
+        android:layout_height="0dp"
+        android:layout_weight="65" />
 
 
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="35"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:layout_marginStart="60sp"
+            android:layout_marginEnd="60sp">
+
+
+            <TextView
+                android:id="@+id/bike_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="20sp"
+                android:textSize="25sp"
+                android:text="Bike XX"/>
 
 
 
@@ -41,61 +50,56 @@
         android:id="@+id/charge_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Charge: "></TextView>
+        android:text="Charge: "
+        android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/charge_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="100 "></TextView>
-
-
+        android:text="100"
+        android:textSize="15sp"/>
 
 
 </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/availability_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="available"></TextView>
-
-
-
-        </LinearLayout>
-
+                android:text="available"
+                android:textSize="15sp"></TextView>
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_marginBottom="46sp">
 
             <Button
                 android:id="@+id/rent_bike_button"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:background="@drawable/custom_button_default"
+                android:background="@drawable/custom_button_states"
                 android:textColor="#FFFFFF"
                 android:text="@string/rent_bike"
                  />
 
             <Button
                 android:id="@+id/reserve_bike_button"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:background="@drawable/custom_button_default"
+                android:background="@drawable/custom_button_states"
                 android:textColor="#FFFFFF"
                 android:text="@string/reserve_bike"
                  />
 
         </LinearLayout>
 
-
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
