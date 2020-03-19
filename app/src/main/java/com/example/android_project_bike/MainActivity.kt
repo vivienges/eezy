@@ -29,11 +29,16 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.android.gms.maps.model.Marker
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+import android.widget.Toolbar
+import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+
 
     private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
@@ -53,6 +58,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
 
         auth = FirebaseAuth.getInstance()
 
@@ -74,37 +80,11 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
 
         listView.adapter = adapter
 
-        db.collection("bikes")
-            .addSnapshotListener { snapshots, e ->
-                if (e == null && snapshots != null)
-                //TODO: Add error handling
-                    for (documentChange in snapshots!!.documentChanges) {
-                        when (documentChange.type) {
-                            DocumentChange.Type.ADDED -> {
-                                idList.add("Bike " + documentChange.document.id)
-
-                                bike = documentChange.document.toObject(Bike::class.java)
-
-                                val position =
-                                    LatLng(bike.position.latitude, bike.position.longitude)
-                                mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document}.data.id"))
-                            }
-                            DocumentChange.Type.REMOVED ->
-                                idList.remove("Bike " + documentChange.document.id)
-                        }
-                    }
-                adapter.notifyDataSetChanged()
-            }
-
-
         var bundle = Bundle()
 
         listView.setOnItemClickListener { parent, view, position, id ->
 
-
             val itemText = listView.getItemAtPosition(position).toString().replace("[^0-9]".toRegex(), "")
-
-
             bundle.putString("bikeId", itemText)
 
             if (loggedIn != true) {
@@ -143,7 +123,59 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback  {
         val jonkoping = LatLng(57.778767, 14.163388)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jonkoping, 12F))
 
+        var markers = mutableListOf<Marker>()
 
+        db.collection("bikes")
+            .addSnapshotListener { snapshots, e ->
+                if (e == null && snapshots != null)
+                //TODO: Add error handling
+                    for (documentChange in snapshots!!.documentChanges) {
+                        when (documentChange.type) {
+                            DocumentChange.Type.ADDED -> {
+
+                                bike = documentChange.document.toObject(Bike::class.java)
+
+                                val position = LatLng(bike.position.latitude, bike.position.longitude)
+                                var marker = mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document.id}"))
+                                markers.add(marker)
+
+                                if (bike.available == true) {
+
+                                    idList.add("Bike " + documentChange.document.id)
+
+                                }
+
+                                else {
+                                    markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = false
+                                }
+                            }
+                            DocumentChange.Type.MODIFIED -> {
+
+                                bike = documentChange.document.toObject(Bike::class.java)
+
+                                if (bike.available == true) {
+
+                                    idList.add("Bike " + documentChange.document.id)
+
+                                    val position =
+                                        LatLng(bike.position.latitude, bike.position.longitude)
+                                    markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = true
+
+                                }
+
+                                else {
+                                    idList.remove("Bike " + documentChange.document.id)
+                                    markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = false
+                                }
+                            }
+                            DocumentChange.Type.REMOVED ->
+                                idList.remove("Bike " + documentChange.document.id)
+
+                        }
+                    }
+                idList.sort()
+                adapter.notifyDataSetChanged()
+            }
 
     }
     companion object {

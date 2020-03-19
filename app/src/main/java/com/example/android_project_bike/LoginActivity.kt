@@ -25,7 +25,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     val RC_SIGN_IN: Int = 1
     lateinit var mGoogleSignInClient: GoogleSignInClient
@@ -33,7 +33,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private var loggedIn = false
 
-
+    lateinit var bundle : Bundle
 
 
     // private lateinit var firebaseAuth: FirebaseAuth
@@ -44,8 +44,7 @@ class LoginActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        val intent = intent
-        val bundle = intent.getBundleExtra("bundle")
+        bundle = intent.getBundleExtra("bundle")
 
 
 
@@ -127,6 +126,14 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(account!!)
                 Toast.makeText(this, "Welcome, ${account.displayName}", Toast.LENGTH_LONG).show()
 
+                val user = auth.currentUser
+                loggedIn = user != null
+
+                val intent = Intent(this, BikeDetailsActivity::class.java)
+                intent.putExtra("bundle", bundle)
+                startActivity(intent)
+                finish()
+
             } catch (e: ApiException) {
                 Log.d("ERROR", e.toString())
                 Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
@@ -158,6 +165,8 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
     }
+
+
 
 
 

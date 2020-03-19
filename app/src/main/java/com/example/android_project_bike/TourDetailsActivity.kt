@@ -26,9 +26,10 @@ class TourDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tour_details)
 
-        val bikeId = intent.getIntExtra(EXTRA_BIKE_ID, -1)
+        val bundle = intent.getBundleExtra("bundle")
+        val bikeId = bundle.getString("bikeId")
         val bikeTitle = findViewById<TextView>(R.id.title_label)
-        val titleText = resources.getString(R.string.bike) + " " + bikeId.toString()
+        val titleText = resources.getString(R.string.bike) + " " + bikeId
         bikeTitle.text = titleText
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as? SupportMapFragment
