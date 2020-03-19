@@ -66,28 +66,19 @@ class AddPaymentActivity : AppCompatActivity() {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("SUCCESS", "createUserWithEmail:success")
                         val user = auth.currentUser
-                        val historyDocument = db
-                            .collection("histories")
-                            .document()
-                        historyDocument
-                            .set(
-                                hashMapOf(
-                                    "history" to emptyList<DocumentReference>()
-                                )
-                            )
                         val userDocument = db
                             .collection("users")
                             .document(user!!.uid)
                         val userInfo = hashMapOf(
                             "email" to user.email,
                             "payment" to payment,
-                            "history" to historyDocument
+                            "history" to emptyList<DocumentReference>()
                         )
                         userDocument.set(userInfo)
                             .addOnSuccessListener { result ->
                                 Log.d("SUCCESS", "Added $result")
                             }
-                            .addOnFailureListener { exception ->
+                            .addOnFailureListener {
                                 Log.d("ERROR", "Adding data failed!")
                             }
                         val intent = Intent(this, BikeDetailsActivity::class.java)
@@ -102,8 +93,6 @@ class AddPaymentActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-
-                    // ...
                 }
 
         }

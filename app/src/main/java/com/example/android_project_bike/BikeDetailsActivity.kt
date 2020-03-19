@@ -1,5 +1,6 @@
 package com.example.android_project_bike
 
+import android.graphics.BitmapRegionDecoder
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -11,17 +12,18 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-import org.w3c.dom.Text
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.*
+import kotlin.concurrent.thread
 
 class BikeDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
 
     private var db = FirebaseFirestore.getInstance()
+    private lateinit var auth: FirebaseAuth
 
-    lateinit var bike: Bike
+    private lateinit var bike: Bike
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,11 +34,13 @@ class BikeDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onStart() {
         super.onStart()
 
+        auth = FirebaseAuth.getInstance()
+
         bike = Bike()
 
         val intent = intent
         val bundle = intent.getBundleExtra("bundle")
-        val bikeId = bundle.getString("bikeId")
+        val bikeId = bundle?.getString("bikeId")
 
         db.collection("bikes").document("$bikeId")
             .addSnapshotListener { snapshot, e ->
@@ -50,9 +54,9 @@ class BikeDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     bike = snapshot.toObject(Bike::class.java)!!
 
                     val info = findViewById<TextView>(R.id.charge_value)
-                    info.text = "${bike!!.charge}"
+                    info.text = "${bike.charge}"
 
-                    val position = LatLng(bike.position!!.latitude, bike.position!!.longitude)
+                    val position = LatLng(bike.position.latitude, bike.position.longitude)
                     mMap.addMarker(MarkerOptions().position(position).title("Bike $bikeId"))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18F))
 
@@ -69,28 +73,39 @@ class BikeDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-        val rent_bike_button = findViewById<Button>(R.id.rent_bike_button)
+        val rentBikeButton = findViewById<Button>(R.id.rent_bike_button)
 
-        rent_bike_button.setOnClickListener() {
-
-
-
+        rentBikeButton.setOnClickListener {
+            val rideData = hashMapOf(
+                "start_time" to FieldValue.serverTimestamp(),
+                "total_price" to 0,
+                "total_km" to 0,
+                "route" to listOf(GeoPoint(bike.position.latitude, bike.position.longitude))
+            )
+            val userRef = db.collection("users").document(auth.currentUser!!.uid)
+            val bikeRef = db.collection("bikes").document(bikeId!!)
+            db.runBatch {
+                val ride = db.collection("rides").document()
+                ride.set(rideData)
+                userRef.update("history", FieldValue.arrayUnion(ride.id))
+                bikeRef.update(
+                    mapOf(
+                        "available" to false,
+                        "locked" to false,
+                        "current_user" to auth.currentUser!!.email
+                    )
+                )
+            }.addOnSuccessListener {
+                Log.d("SUCCESS", "")
+            }
         }
-
     }
 
-
-
-
     override fun onMapReady(googleMap: GoogleMap) {
-
-        val intent = intent
-        val bikeId = intent.getStringExtra(EXTRA_BIKE_ID)
 
         mMap = googleMap
 
     }
-
 
     companion object {
         const val EXTRA_BIKE_ID = "BIKE_ID"

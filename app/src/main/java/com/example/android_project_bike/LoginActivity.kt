@@ -23,6 +23,8 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class LoginActivity : AppCompatActivity() {
@@ -31,12 +33,9 @@ class LoginActivity : AppCompatActivity() {
     lateinit var mGoogleSignInClient: GoogleSignInClient
     lateinit var mGoogleSignInOptions: GoogleSignInOptions
     private lateinit var auth: FirebaseAuth
+    private lateinit var bundle: Bundle
     private var loggedIn = false
-
-
-
-
-    // private lateinit var firebaseAuth: FirebaseAuth
+    private var db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +44,7 @@ class LoginActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         val intent = intent
-        val bundle = intent.getBundleExtra("bundle")
+        bundle = intent.getBundleExtra("bundle")!!
 
 
 
@@ -125,7 +124,6 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account!!)
-                Toast.makeText(this, "Welcome, ${account.displayName}", Toast.LENGTH_LONG).show()
 
             } catch (e: ApiException) {
                 Log.d("ERROR", e.toString())
@@ -148,10 +146,30 @@ class LoginActivity : AppCompatActivity() {
                 if (task.isSuccessful) {
                     // Sign in success, update UI with the signed-in user's information
                     Log.d("SUCCESS", "signInWithCredential:success")
-                    if (task.result!!.additionalUserInfo!!.isNewUser)
-                    //TODO: Add user info to database
-                        Log.d("INFO", "New user created: " + acct.displayName )
-                    //TODO: Redirect user to main activity
+                    if (task.result!!.additionalUserInfo!!.isNewUser) {
+                        val user = auth.currentUser
+                        val userDocument = db
+                            .collection("users")
+                            .document(user!!.uid)
+                        val userInfo = hashMapOf(
+                            "email" to user.email,
+                            "payment" to 0,
+                            "history" to emptyList<DocumentReference>()
+                        )
+                        userDocument.set(userInfo)
+                            .addOnSuccessListener { result ->
+                                Log.d("SUCCESS", "Added $result")
+                            }
+                            .addOnFailureListener {
+                                Log.d("ERROR", "Adding data failed!")
+                            }
+                        Log.d("INFO", "New user created: " + acct.displayName)
+                    }
+                    Toast.makeText(this, "Welcome, ${acct.displayName}", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this, BikeDetailsActivity::class.java)
+                    intent.putExtra("bundle", bundle)
+                    startActivity(intent)
+                    finish()
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("ERROR", "signInWithCredential:failure", task.exception)
