@@ -1,104 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TourDetailsActivity" >
+    android:fillViewport="true"
+    tools:context=".TourDetailsActivity">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+    <fragment
+        android:id="@+id/map_fragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0sp"
+        android:layout_weight="65" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="35"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginStart="60sp"
+        android:layout_marginEnd="60sp">
+
+    <TextView
+        android:id="@+id/title_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:text="Bike XX"/>
+
+
+    <TextView
+        android:id="@+id/distance_text_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/current_distance" />
+
+    <TextView
+        android:id="@+id/distance_var_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12,4 km" />
+
+    <TextView
+        android:id="@+id/price_text_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/current_price" />
+
+    <TextView
+        android:id="@+id/price_var_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="61 SEK" />
+
+    <TextView
+        android:id="@+id/battery_text_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/battery_level" />
+
+    <TextView
+        android:id="@+id/battery_var_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="87%" />
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-            <TextView
-                android:id="@+id/title_label"
-                android:layout_margin="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
-
-            <fragment
-                android:id="@+id/map_fragment"
-                android:layout_margin="20dp"
-                android:name="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="300sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title_label" />
-
-            <TextView
-                android:id="@+id/distance_text_label"
-                android:layout_margin="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/map_fragment"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/distance_var_label"
-                android:text="@string/current_distance" />
-
-            <TextView
-                android:id="@+id/distance_var_label"
-                android:layout_margin="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/map_fragment"
-                app:layout_constraintStart_toEndOf="@id/distance_text_label"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text="12,4 km" />
-
-            <TextView
-                android:id="@+id/price_text_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/distance_text_label"
-                app:layout_constraintStart_toStartOf="@id/distance_text_label"
-                android:text="@string/current_price" />
-
-            <TextView
-                android:id="@+id/price_var_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/distance_var_label"
-                app:layout_constraintStart_toStartOf="@id/distance_var_label"
-                android:text="61 SEK" />
-
-            <TextView
-                android:id="@+id/battery_text_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/price_text_label"
-                app:layout_constraintBottom_toTopOf="@id/return_button"
-                app:layout_constraintStart_toStartOf="@id/price_text_label"
-                android:text="@string/battery_level" />
-
-            <TextView
-                android:id="@+id/battery_var_label"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@id/price_var_label"
-                app:layout_constraintBottom_toTopOf="@id/return_button"
-                app:layout_constraintStart_toStartOf="@+id/price_var_label"
-                android:text="87%" />
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_marginBottom="46sp">
 
             <Button
-                android:id="@+id/return_button"
-                android:layout_width="wrap_content"
+                android:id="@+id/rent_bike_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:text="RETURN BIKE"
-                android:background="@drawable/custom_button_states"
-                android:textColor="#ffffff"/>
+                android:background="@drawable/custom_button_default"
+                android:textColor="#FFFFFF"
+                android:text="Pause Ride"
+                />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/reserve_bike_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@drawable/custom_button_default"
+                android:textColor="#FFFFFF"
+                android:text="Return Bike"
+                />
 
-    </ScrollView>
+        </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

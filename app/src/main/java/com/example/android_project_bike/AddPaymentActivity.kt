@@ -51,6 +51,7 @@ class AddPaymentActivity : AppCompatActivity() {
             val radioButton = radioGroup.checkedRadioButtonId
 
             var payment = 0
+            val list = emptyList<DocumentReference>()
 
             when (radioButton) {
                 R.id.radio_1 -> payment = 1
@@ -58,7 +59,7 @@ class AddPaymentActivity : AppCompatActivity() {
                 R.id.radio_3 -> payment = 3
             }
 
-            var user = User("$email", "$password", payment)
+            var user = User("$email", "$password", payment, emptyList<DocumentReference>())
 
             auth.createUserWithEmailAndPassword(user.email, user.password)
                 .addOnCompleteListener(this) { task ->
@@ -66,22 +67,13 @@ class AddPaymentActivity : AppCompatActivity() {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("SUCCESS", "createUserWithEmail:success")
                         val user = auth.currentUser
-                        val historyDocument = db
-                            .collection("histories")
-                            .document()
-                        historyDocument
-                            .set(
-                                hashMapOf(
-                                    "history" to emptyList<DocumentReference>()
-                                )
-                            )
                         val userDocument = db
                             .collection("users")
                             .document(user!!.uid)
                         val userInfo = hashMapOf(
                             "email" to user.email,
                             "payment" to payment,
-                            "history" to historyDocument
+                            "history" to emptyList<DocumentReference>()
                         )
                         userDocument.set(userInfo)
                             .addOnSuccessListener { result ->
@@ -103,7 +95,6 @@ class AddPaymentActivity : AppCompatActivity() {
                         ).show()
                     }
 
-                    // ...
                 }
 
         }

@@ -5,10 +5,10 @@
     android:color="@color/colorPrimary"
     />
 
-    <padding android:left="15dp"
-        android:right="15dp"></padding>
+    <padding android:left="15sp"
+        android:right="15sp"></padding>
 
-    <corners android:radius="25dp"/>
+    <corners android:radius="25sp"/>
 
 
 </shape>
