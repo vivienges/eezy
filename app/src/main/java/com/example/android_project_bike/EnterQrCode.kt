@@ -8,7 +8,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 
 class EnterQrCode : AppCompatActivity() {
 
@@ -21,6 +23,8 @@ class EnterQrCode : AppCompatActivity() {
 
         val bundle = intent.getBundleExtra("bundle")
         val bikeId = bundle.getString("bikeId")
+        val latitude = intent.getDoubleExtra("latitude", 0.0)
+        val longitude = intent.getDoubleExtra("longitude", 0.0)
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
@@ -41,11 +45,33 @@ class EnterQrCode : AppCompatActivity() {
                     )
                     .addOnSuccessListener { result ->
                         Log.d("SUCCESS", "Added $result")
+                        val rideData = hashMapOf(
+                            "start_time" to FieldValue.serverTimestamp(),
+                            "total_price" to 0,
+                            "total_km" to 0,
+                            "route" to listOf(GeoPoint(latitude, longitude))
+                        )
+                        val userRef = db.collection("users").document(auth.currentUser!!.uid)
+                        val bikeRef = db.collection("bikes").document(bikeId!!)
+                        db.runBatch {
+                            val ride = db.collection("rides").document()
+                            ride.set(rideData)
+                            userRef.update("history", FieldValue.arrayUnion(ride.id))
+                            bikeRef.update(
+                                mapOf(
+                                    "available" to false,
+                                    "locked" to false,
+                                    "current_user" to auth.currentUser!!.email
+                                )
+                            )
+                        }.addOnSuccessListener {
+                            Log.d("SUCCESS", "")
+                        }
+
                     }
                     .addOnFailureListener { exception ->
                         Log.d("ERROR", "Adding data failed!")
                     }
-
 
                 val intent = Intent(this, TourDetailsActivity::class.java)
                 intent.putExtra("bundle", bundle)
