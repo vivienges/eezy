@@ -52,7 +52,8 @@
         <uses-library android:name="com.google.android.maps" />
 
         <activity android:name=".BikeDetailsActivity" />
-        <activity android:name=".LoginWithGoogleActivity" />
+        <activity android:name=".EnterQrCode"/>
+        <activity android:name=".BaseActivity"/>
         <activity android:name=".CreateAccountActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".AddPaymentActivity" />

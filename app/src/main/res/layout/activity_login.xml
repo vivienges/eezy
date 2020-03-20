@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     tools:context=".LoginActivity"
-    android:background="#efefef">
+    android:background="@color/colorBackground">
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -55,7 +55,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="60dp"
             android:background="@drawable/custom_button_states"
-            android:textColor="#fff"
+            android:textColor="@color/colorButtonText"
             android:text="@string/login_button" />
 
         <LinearLayout
@@ -106,7 +106,7 @@
                     android:text="@string/create_account"
                     android:textSize="12sp"
                     android:background="@drawable/custom_button_states"
-                    android:textColor="#fff"
+                    android:textColor="@color/colorButtonText"
 
                     />
 

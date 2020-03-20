@@ -13,7 +13,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import org.w3c.dom.Text
 
-class TourDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
+class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     lateinit var mMap: GoogleMap
 

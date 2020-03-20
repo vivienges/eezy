@@ -37,7 +37,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class MainActivity : BaseActivity(), OnMapReadyCallback {
 
 
     private var db = FirebaseFirestore.getInstance()

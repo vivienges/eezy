@@ -22,23 +22,19 @@
         android:layout_weight="3"
 />
 
-    <TableRow
+    <LinearLayout
         android:id="@+id/available_bikes"
-        android:layout_width="412dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="#DAD5D5"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:orientation="vertical">
 
         <ListView
             android:id="@+id/list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#FFFFFF" />
-    </TableRow>
+            android:background="@color/colorBackground" />
+    </LinearLayout>
 
     </LinearLayout>
 

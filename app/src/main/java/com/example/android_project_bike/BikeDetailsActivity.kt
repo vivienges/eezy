@@ -30,7 +30,7 @@ import android.widget.FrameLayout
 import com.google.firebase.auth.FirebaseAuth
 
 
-class BikeDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
+class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     lateinit var mMap: GoogleMap
 

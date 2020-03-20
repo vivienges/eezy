@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#a1c85f</color>
-    <color name="colorPrimaryPressed">#96c14c</color>
-    <color name="colorPrimaryDisabled">#99a1c85f</color>
+    <color name="colorPrimaryButtonPressed">#96c14c</color>
+    <color name="colorPrimaryButtonDisabled">#99a1c85f</color>
+    <color name="colorButtonText">@android:color/white</color>
+    <color name="colorBackground">#efefef</color>
 </resources>

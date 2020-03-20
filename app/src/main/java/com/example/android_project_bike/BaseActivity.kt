@@ -9,8 +9,11 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.view.LayoutInflater
 import android.view.View
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
-
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.navigation.NavigationView
 
 
 open class BaseActivity : AppCompatActivity() {
@@ -25,9 +28,17 @@ open class BaseActivity : AppCompatActivity() {
         val activityContainer = fullView.findViewById<View>(R.id.activity_content) as FrameLayout
         layoutInflater.inflate(layoutResID, activityContainer, true)
         super.setContentView(fullView)
-        val toolbar = findViewById<View>(R.id.toolbar) as Toolbar
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        title = "Activity Title"
+        //supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        title = resources.getString(R.string.app_name)
+
+        val mDrawerToggle = ActionBarDrawerToggle(this, fullView, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        fullView.addDrawerListener(mDrawerToggle)
+        mDrawerToggle.isDrawerIndicatorEnabled = true
+        mDrawerToggle.syncState()
+
+
     }
 
 }
