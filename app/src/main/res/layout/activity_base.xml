@@ -24,6 +24,12 @@
             android:layout_height="match_parent" />
 
 
+            <fragment
+                android:id="@+id/fragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.example.android_project_bike.ProfileFragment"/>
+
 
     </LinearLayout>
   <com.google.android.material.navigation.NavigationView
@@ -31,5 +37,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/menu"/>
+        android:background="@color/colorPrimary"
+        app:menu="@menu/menu"
+        app:headerLayout="@layout/menu_header"
+        app:itemTextColor="@android:color/white"
+        app:itemIconTint="@android:color/white"
+      />
 </androidx.drawerlayout.widget.DrawerLayout>

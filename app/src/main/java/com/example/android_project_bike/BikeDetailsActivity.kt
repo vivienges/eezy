@@ -145,7 +145,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     Log.d("DATA", "Current data: ${snapshot.data}")
                     bike = snapshot.toObject(Bike::class.java)!!
 
-                    val info = findViewById<TextView>(R.id.charge_value)
+                    val info = findViewById<TextView>(R.id.charge_val_label)
                     info.text = "${bike!!.charge}"
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">eezy</string>
-    <string name="login_button">Einloggen</string>
+    <string name="login">Einloggen</string>
     <string name="create_account">Erstelle einen Account</string>
     <string name="password">Passwort</string>
     <string name="email">Email</string>
@@ -12,9 +12,14 @@
     <string name="reserve_bike">Fahrrad reservieren</string>
     <string name="sign_in_option">Noch keinen Account?</string>
     <string name="title_activity_maps">Karte</string>
-    <string name="current_distance">Bisherige Strecke:</string>
-    <string name="current_price">Aktueller Preis:</string>
-    <string name="battery_level">Akkustand:</string>
+    <string name="current_distance">Bisherige Strecke: </string>
+    <string name="current_price">Aktueller Preis: </string>
+    <string name="charge_level">Akkustand: </string>
     <string name="bike">Fahrrad</string>
     <string name="history">Vergangene Fahrten</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="reservation">Das Fahrrad ist reserviert für</string>
+    <string name="scan_code">Code scannen</string>
+    <string name="return_bike">Fahrrad zurückgeben</string>
+    <string name="pause_ride">Fahrt pausieren</string>
 </resources>

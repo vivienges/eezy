@@ -47,14 +47,14 @@
     android:orientation="horizontal">
 
     <TextView
-        android:id="@+id/charge_label"
+        android:id="@+id/charge_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Charge: "
+        android:text="@string/charge_level"
         android:textSize="15sp"/>
 
     <TextView
-        android:id="@+id/charge_value"
+        android:id="@+id/charge_val"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="100"
@@ -83,8 +83,9 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:background="@drawable/custom_button_states"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/colorButtonText"
                 android:text="@string/rent_bike"
+                android:layout_marginEnd="4sp"
                  />
 
             <Button
@@ -93,8 +94,9 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:background="@drawable/custom_button_states"
-                android:textColor="#FFFFFF"
+                android:textColor="@color/colorButtonText"
                 android:text="@string/reserve_bike"
+                android:layout_marginStart="4sp"
                  />
 
         </LinearLayout>

@@ -57,7 +57,6 @@
         <activity android:name=".CreateAccountActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".AddPaymentActivity" />
-        <activity android:name=".EnterQrCode" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

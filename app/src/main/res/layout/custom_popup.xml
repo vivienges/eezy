@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="The bike is reserved for"
+        android:text="@string/reservation"
         android:textSize="20sp"
         />
 
@@ -20,6 +20,7 @@
         android:name="com.example.android_project_bike.TimerFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_margin="20sp"
         />
 
     <LinearLayout
@@ -35,8 +36,9 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_button_states"
-            android:textColor="#FFFFFF"
-            android:text="Cancel"
+            android:textColor="@color/colorButtonText"
+            android:text="@string/cancel"
+            android:layout_marginEnd="4sp"
             />
 
         <Button
@@ -45,8 +47,9 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:background="@drawable/custom_button_states"
-            android:textColor="#FFFFFF"
-            android:text="Scan QR Code"
+            android:textColor="@color/colorButtonText"
+            android:text="@string/scan_code"
+            android:layout_marginStart="4sp"
             />
 
     </LinearLayout>
