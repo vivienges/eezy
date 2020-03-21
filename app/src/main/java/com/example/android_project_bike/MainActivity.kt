@@ -139,7 +139,7 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                                 var marker = mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document.id}"))
                                 markers.add(marker)
 
-                                if (bike.available == true) {
+                                if (bike.available) {
 
                                     idList.add("Bike " + documentChange.document.id)
 
@@ -153,12 +153,10 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
                                 bike = documentChange.document.toObject(Bike::class.java)
 
-                                if (bike.available == true) {
+                                if (bike.available) {
+                                    if ( ("Bike " + documentChange.document.id) !in idList)
+                                        idList.add("Bike " + documentChange.document.id)
 
-                                    idList.add("Bike " + documentChange.document.id)
-
-                                    val position =
-                                        LatLng(bike.position.latitude, bike.position.longitude)
                                     markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = true
 
                                 }
@@ -173,8 +171,8 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
                         }
                     }
-                val temp = idList.sort()
-               // idList = temp.distinct()
+                idList.sort()
+                adapter.notifyDataSetChanged()
 
                 if (idList.isEmpty()) {
                     availability.visibility = View.VISIBLE
@@ -185,12 +183,10 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                     availability.visibility = View.GONE
                     listView.visibility = View.VISIBLE
                 }
-
-
-                adapter.notifyDataSetChanged()
             }
 
     }
+
     companion object {
         const val EXTRA_BIKE_ID = "BIKE_ID"
     }
