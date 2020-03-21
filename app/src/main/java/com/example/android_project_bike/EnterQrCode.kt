@@ -56,7 +56,7 @@ class EnterQrCode : AppCompatActivity() {
                         db.runBatch {
                             val ride = db.collection("rides").document()
                             ride.set(rideData)
-                            userRef.update("history", FieldValue.arrayUnion(ride.id))
+                            userRef.update("history", FieldValue.arrayUnion(ride))
                             bikeRef.update(
                                 mapOf(
                                     "available" to false,

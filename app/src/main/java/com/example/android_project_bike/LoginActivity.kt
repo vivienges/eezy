@@ -114,15 +114,6 @@ class LoginActivity : AppCompatActivity() {
             try {
                 val account = task.getResult(ApiException::class.java)
                 firebaseAuthWithGoogle(account!!)
-                Toast.makeText(this, "Welcome, ${account.displayName}", Toast.LENGTH_LONG).show()
-
-                val user = auth.currentUser
-                loggedIn = user != null
-
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-                finish()
-
             } catch (e: ApiException) {
                 Log.d("ERROR", e.toString())
                 Toast.makeText(this, "Google sign in failed :(", Toast.LENGTH_LONG).show()
@@ -142,6 +133,7 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    // Sign in success, update UI with the signed-in user's information
                     Log.d("SUCCESS", "signInWithCredential:success")
                     if (task.result!!.additionalUserInfo!!.isNewUser) {
                         val user = auth.currentUser
@@ -162,8 +154,12 @@ class LoginActivity : AppCompatActivity() {
                             }
                         Log.d("INFO", "New user created: " + acct.displayName)
                     }
-                    Toast.makeText(this, "Welcome, ${acct.displayName}", Toast.LENGTH_LONG).show()}
-                else {
+                    Toast.makeText(this, "Welcome, ${acct.displayName}", Toast.LENGTH_LONG).show()
+                    val intent = Intent(this, MainActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    // If sign in fails, display a message to the user.
                     Log.w("ERROR", "signInWithCredential:failure", task.exception)
                 }
             }
