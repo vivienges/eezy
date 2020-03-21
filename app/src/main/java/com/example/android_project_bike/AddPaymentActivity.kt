@@ -41,11 +41,6 @@ class AddPaymentActivity : AppCompatActivity() {
 
         val confirmSignup = findViewById<Button>(R.id.confirmSignup)
 
-        //TODO: Enable button if all payment details are set
-
-        // database = Firebase.
-
-
         confirmSignup.setOnClickListener {
 
             val radioButton = radioGroup.checkedRadioButtonId
@@ -82,8 +77,8 @@ class AddPaymentActivity : AppCompatActivity() {
                             .addOnFailureListener { exception ->
                                 Log.d("ERROR", "Adding data failed!")
                             }
-                        val intent = Intent(this, BikeDetailsActivity::class.java)
-                        intent.putExtra("bundle", bundle)
+                        val intent = Intent(this, MainActivity::class.java)
+                        //intent.putExtra("bundle", bundle)
                         startActivity(intent)
                         finish()
                     } else {

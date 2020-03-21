@@ -7,10 +7,7 @@ import android.widget.FrameLayout
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.LinearLayout
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
@@ -21,17 +18,42 @@ import androidx.fragment.app.replace
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.rpc.Help
 
 
 abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    lateinit var fullView : DrawerLayout
-    lateinit var activityContainer : FrameLayout
-    lateinit var fragmentContainer : FrameLayout
+    private lateinit var auth: FirebaseAuth
+    private lateinit var fullView : DrawerLayout
+    private lateinit var navigationView: NavigationView
+    private lateinit var navigationMenu: Menu
+    private lateinit var activityContainer : FrameLayout
+    private lateinit var fragmentContainer : FrameLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        auth = FirebaseAuth.getInstance()
+        auth.addAuthStateListener {
+
+            navigationMenu = navigationView.getMenu()
+
+            if (auth.currentUser != null) {
+                navigationMenu.findItem(R.id.menu_profile).setVisible(true)
+                navigationMenu.findItem(R.id.menu_history).setVisible(true)
+                navigationMenu.findItem(R.id.menu_sign_out).setVisible(true)
+                navigationMenu.findItem(R.id.menu_sign_in).setVisible(false)
+            }
+
+            else {
+                navigationMenu.findItem(R.id.menu_profile).setVisible(false)
+                navigationMenu.findItem(R.id.menu_history).setVisible(false)
+                navigationMenu.findItem(R.id.menu_sign_out).setVisible(false)
+                navigationMenu.findItem(R.id.menu_sign_in).setVisible(true)
+            }
+
+        }
     }
 
     override fun setContentView(layoutResID: Int) {
@@ -48,7 +70,7 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         setSupportActionBar(toolbar)
         supportActionBar!!.title = resources.getString(R.string.app_name)
 
-        val navigationView = findViewById<NavigationView>(R.id.navigationView)
+        navigationView = findViewById<NavigationView>(R.id.navigationView)
         navigationView.setNavigationItemSelectedListener(this)
 
         val mDrawerToggle = ActionBarDrawerToggle(this, fullView, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -56,20 +78,27 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         mDrawerToggle.isDrawerIndicatorEnabled = true
         mDrawerToggle.syncState()
 
-
-
     }
+
 
    override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
         var selectedFragment = Fragment()
         val itemId = item.itemId
+       auth = FirebaseAuth.getInstance()
 
-       if ( itemId == R.id.menu_sign_out) {
-           val intent = Intent(this, MainActivity::class.java)
+
+       if ( itemId == R.id.menu_sign_in) {
+           val intent = Intent(this, LoginActivity::class.java)
            startActivity(intent)
        }
 
+       else if ( itemId == R.id.menu_sign_out) {
+           auth.signOut()
+           val intent = Intent(this, MainActivity::class.java)
+           startActivity(intent)
+           finish()
+       }
        else {
            when(itemId) {
                R.id.menu_profile -> selectedFragment = ProfileFragment()

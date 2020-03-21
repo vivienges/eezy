@@ -55,8 +55,8 @@ class CreateAccountActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
 
         val intent = intent
-        val bundle = intent.getBundleExtra("bundle")
-
+        //val bundle = intent.getBundleExtra("bundle")
+        var bundle = Bundle()
 
 
 
@@ -64,11 +64,6 @@ class CreateAccountActivity : AppCompatActivity() {
         addPaymentButton = findViewById<Button>(R.id.add_payment_button)
         val editPassword = findViewById<EditText>(R.id.password_input)
         val passwordConfirmation = findViewById<EditText>(R.id.confirmed_password_input)
-
-
-        //TODO: Check if email already exists
-        //TODO: Check if password is the same
-        //TODO: Hash password
 
         editEmail.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {

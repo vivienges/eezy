@@ -3,9 +3,6 @@ package com.example.android_project_bike
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.ListView
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -29,8 +26,10 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.android.gms.maps.model.Marker
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.widget.Toolbar
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -45,6 +44,8 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     lateinit var adapter : ArrayAdapter<String>
     private var idList= mutableListOf<String>()
+    private lateinit var listView: ListView
+    private lateinit var availability : TextView
     lateinit var bike: Bike
     private var loggedIn = false
 
@@ -69,7 +70,8 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
         mapFragment?.getMapAsync(this)
 
         idList = mutableListOf()
-        val listView = findViewById<ListView>(R.id.list_view)
+        listView = findViewById(R.id.list_view)
+        availability = findViewById(R.id.bikes_availability_label)
 
         adapter = ArrayAdapter(
             applicationContext,
@@ -96,7 +98,6 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
             } else {
 
                 val intent = Intent(this@MainActivity, BikeDetailsActivity::class.java)
-
                 intent.putExtra("bundle", bundle)
                 startActivity(intent)
 
@@ -105,8 +106,8 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
         }
     }
 
-    override fun onRestart() {
-        super.onRestart()
+    override fun onStart() {
+        super.onStart()
 
         val currentUser = auth.currentUser
         loggedIn = currentUser != null
@@ -173,7 +174,20 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
                         }
                     }
-                idList.sort()
+                val temp = idList.sort()
+               // idList = temp.distinct()
+
+                if (idList.isEmpty()) {
+                    availability.visibility = View.VISIBLE
+                    listView.visibility = View.GONE
+                }
+
+                else {
+                    availability.visibility = View.GONE
+                    listView.visibility = View.VISIBLE
+                }
+
+
                 adapter.notifyDataSetChanged()
             }
 

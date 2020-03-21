@@ -22,4 +22,5 @@
     <string name="scan_code">Code scannen</string>
     <string name="return_bike">Fahrrad zurückgeben</string>
     <string name="pause_ride">Fahrt pausieren</string>
+    <string name="no_bikes_available">Momentan sind leider keine Fahrräder verfügbar</string>
 </resources>

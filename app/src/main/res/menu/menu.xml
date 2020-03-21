@@ -6,7 +6,7 @@
 <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu_profile"
-            android:icon="@drawable/ic_person"
+            android:icon="@drawable/ic_profile"
             android:title="Profile" />
         <item
             android:id="@+id/menu_history"
@@ -21,8 +21,14 @@
             android:icon="@drawable/ic_help"
             android:title="Help" />
         <item
-            android:id="@+id/menu_sign_out"
-            android:icon="@drawable/ic_signout"
-            android:title="Sign Out"/>
+        android:id="@+id/menu_sign_out"
+        android:icon="@drawable/ic_signout"
+        android:title="Sign Out"
+        android:visible="false"/>
+        <item
+            android:id="@+id/menu_sign_in"
+            android:icon="@drawable/ic_signin"
+            android:title="Sign In"
+            android:visible="true"/>
 </group>
 </menu>

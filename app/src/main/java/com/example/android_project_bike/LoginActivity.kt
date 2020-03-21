@@ -23,30 +23,24 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 
 
 class LoginActivity : AppCompatActivity() {
 
+    private var db = FirebaseFirestore.getInstance()
     val RC_SIGN_IN: Int = 1
     lateinit var mGoogleSignInClient: GoogleSignInClient
-    lateinit var mGoogleSignInOptions: GoogleSignInOptions
     private lateinit var auth: FirebaseAuth
     private var loggedIn = false
 
-    lateinit var bundle : Bundle
-
-
-    // private lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
         auth = FirebaseAuth.getInstance()
-
-        bundle = intent.getBundleExtra("bundle")
-
-
 
         val login_button = findViewById<Button>(R.id.login_button)
 
@@ -64,8 +58,7 @@ class LoginActivity : AppCompatActivity() {
                         val user = auth.currentUser
                         loggedIn = user != null
 
-                        val intent = Intent(this, BikeDetailsActivity::class.java)
-                        intent.putExtra("bundle", bundle)
+                        val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {
@@ -101,15 +94,12 @@ class LoginActivity : AppCompatActivity() {
             }
 
 
-
-
-
         val createAccount = findViewById<Button>(R.id.createAccount)
 
         createAccount.setOnClickListener {
 
             val intent = Intent(this, CreateAccountActivity::class.java)
-            intent.putExtra("bundle", bundle)
+           // intent.putExtra("bundle", bundle)
             startActivity(intent)
         }
 
@@ -129,14 +119,13 @@ class LoginActivity : AppCompatActivity() {
                 val user = auth.currentUser
                 loggedIn = user != null
 
-                val intent = Intent(this, BikeDetailsActivity::class.java)
-                intent.putExtra("bundle", bundle)
+                val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
 
             } catch (e: ApiException) {
                 Log.d("ERROR", e.toString())
-                Toast.makeText(this, "Google sign in failed:(", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Google sign in failed :(", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -153,14 +142,28 @@ class LoginActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
                     Log.d("SUCCESS", "signInWithCredential:success")
-                    if (task.result!!.additionalUserInfo!!.isNewUser)
-                    //TODO: Add user info to database
-                        Log.d("INFO", "New user created: " + acct.displayName )
-                    //TODO: Redirect user to main activity
-                } else {
-                    // If sign in fails, display a message to the user.
+                    if (task.result!!.additionalUserInfo!!.isNewUser) {
+                        val user = auth.currentUser
+                        val userDocument = db
+                            .collection("users")
+                            .document(user!!.uid)
+                        val userInfo = hashMapOf(
+                            "email" to user.email,
+                            "payment" to 0,
+                            "history" to emptyList<DocumentReference>()
+                        )
+                        userDocument.set(userInfo)
+                            .addOnSuccessListener { result ->
+                                Log.d("SUCCESS", "Added $result")
+                            }
+                            .addOnFailureListener {
+                                Log.d("ERROR", "Adding data failed!")
+                            }
+                        Log.d("INFO", "New user created: " + acct.displayName)
+                    }
+                    Toast.makeText(this, "Welcome, ${acct.displayName}", Toast.LENGTH_LONG).show()}
+                else {
                     Log.w("ERROR", "signInWithCredential:failure", task.exception)
                 }
             }
