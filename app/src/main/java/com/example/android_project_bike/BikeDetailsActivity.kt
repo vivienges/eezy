@@ -74,6 +74,8 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             val intent = Intent(this, EnterQrCode::class.java)
             intent.putExtra("bundle", bundle)
+            intent.putExtra("latitude", bike.position.latitude)
+            intent.putExtra("longitude", bike.position.longitude)
             startActivity(intent)
         }
 
@@ -121,8 +123,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             scanQRCodeButton.setOnClickListener {
                 val intent = Intent(this, EnterQrCode::class.java)
                 intent.putExtra("bundle", bundle)
-                intent.putExtra("latitude", bike.position.latitude)
-                intent.putExtra("longitude", bike.position.longitude)
                 startActivity(intent)
             }
 
