@@ -84,7 +84,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     .addOnFailureListener { exception ->
                         Log.d("ERROR", "Adding data failed!")
                     }
-                pauseRideButton.text = "Continue Ride"
+                pauseRideButton.text = resources.getString(R.string.continue_ride)
                 Toast.makeText(this, "Your ride was paused", Toast.LENGTH_LONG).show()
             }
 
@@ -101,7 +101,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     .addOnFailureListener { exception ->
                         Log.d("ERROR", "Adding data failed!")
                     }
-                pauseRideButton.text = "Pause Ride"
+                pauseRideButton.text = resources.getString(R.string.pause_ride)
                 Toast.makeText(this, "Your ride was continued", Toast.LENGTH_LONG).show()
 
             }

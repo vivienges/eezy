@@ -23,4 +23,6 @@
     <string name="return_bike">Fahrrad zurückgeben</string>
     <string name="pause_ride">Fahrt pausieren</string>
     <string name="no_bikes_available">Momentan sind leider keine Fahrräder verfügbar</string>
+    <string name="continue_ride">Fahrt fortsetzen</string>
+    <string name="view_reservation">View reservation</string>
 </resources>

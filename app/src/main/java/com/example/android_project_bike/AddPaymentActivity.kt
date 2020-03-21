@@ -20,7 +20,6 @@ import com.google.firebase.firestore.DocumentReference
 class AddPaymentActivity : AppCompatActivity() {
 
     private var db = FirebaseFirestore.getInstance()
-    private lateinit var database: DatabaseReference
     private lateinit var auth: FirebaseAuth
 
 

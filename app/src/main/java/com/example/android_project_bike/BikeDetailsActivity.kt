@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.FirebaseFirestore
 import android.os.CountDownTimer
 import android.widget.FrameLayout
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -27,11 +28,14 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
 
-    lateinit var bike: Bike
-    lateinit var bikeId: String
-    lateinit var dialog: Dialog
-    lateinit var countDownTimer: CountDownTimer
-    var timeLeftInMilliSec = MAX_RESERVATION_TIME
+    private lateinit var bike: Bike
+    private lateinit var bikeId: String
+    private lateinit var dialog: Dialog
+    private lateinit var countDownTimer: CountDownTimer
+    private var timeLeftInMilliSec = MAX_RESERVATION_TIME
+    private var bikeReserved = false
+    private lateinit var user: User
+    private var payment = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,6 +65,31 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         val reserveBikeButton = findViewById<Button>(R.id.return_bike_button)
 
         rentBikeButton.setOnClickListener {
+
+            db.collection("users").document(currentUser.uid)
+                .addSnapshotListener { snapshot, e ->
+                    if (e != null) {
+                        Log.w("FAIL", "Listen failed.", e)
+                        return@addSnapshotListener
+                    }
+
+                    if (snapshot != null && snapshot.exists()) {
+                        Log.d("DATA", "Current data: ${snapshot.data}")
+                        user = snapshot.toObject(User::class.java)!!
+
+                        payment = user.payment
+
+                    } else {
+                        Log.d("NULL", "Current data: null")
+                    }
+                }
+
+            if (payment == 0) {
+
+                val intent = Intent(this, AddPaymentActivity::class.java)
+                startActivity(intent)
+
+            }
 
             val intent = Intent(this, EnterQrCode::class.java)
             intent.putExtra("bundle", bundle)
@@ -96,6 +125,12 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     Log.d("ERROR", "Adding data failed!")
                 }
 
+            bikeReserved = true
+
+            /*if (bikeReserved) {
+                reserveBikeButton.text = getString(R.string.view_reservation)
+            }*/
+
 
             //TODO: Scan Code --> Proceed to ScanActivity
 
@@ -103,6 +138,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             cancelReservationButton.setOnClickListener {
                 cancelReservation(dialog, timer)
+                bikeReserved = false
             }
 
             val scanQRCodeButton = dialog.findViewById<Button>(R.id.scan_code_button)
@@ -119,8 +155,11 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     override fun onBackPressed() {
 
-        if (dialog.isShowing == false) {
+        if (bikeReserved == false) {
             super.onBackPressed()
+        }
+        else {
+            Toast.makeText(this, "You can't leave this page if you have an ongoing reservation", Toast.LENGTH_LONG).show()
         }
     }
 

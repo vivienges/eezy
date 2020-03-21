@@ -152,9 +152,15 @@ class LoginActivity : AppCompatActivity() {
                             .addOnFailureListener {
                                 Log.d("ERROR", "Adding data failed!")
                             }
+
+                        val intent = Intent(this, AddPaymentActivity::class.java)
+                        startActivity(intent)
+
                         Log.d("INFO", "New user created: " + acct.displayName)
                     }
                     Toast.makeText(this, "Welcome, ${acct.displayName}", Toast.LENGTH_LONG).show()
+
+
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     finish()
