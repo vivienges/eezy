@@ -38,7 +38,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
         val titleText = resources.getString(R.string.bike) + " " + bikeId
         bikeTitle.text = titleText
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as? SupportMapFragment
+            .findFragmentById(R.id.map_fragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
     }
 
