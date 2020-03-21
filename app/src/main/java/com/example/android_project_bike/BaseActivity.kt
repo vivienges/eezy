@@ -14,12 +14,15 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isInvisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentManager.findFragment
 import androidx.fragment.app.replace
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.rpc.Help
+import kotlinx.android.synthetic.main.activity_base.*
+import kotlin.reflect.typeOf
 
 
 abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
@@ -30,11 +33,42 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
     private lateinit var navigationMenu: Menu
     private lateinit var activityContainer : FrameLayout
     private lateinit var fragmentContainer : FrameLayout
+    private lateinit var fragment : Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
+    }
+
+    override fun setContentView(layoutResID: Int) {
+
+        fullView = layoutInflater.inflate(R.layout.activity_base, null) as DrawerLayout
+        activityContainer = fullView.findViewById<View>(R.id.activity_content) as FrameLayout
+        layoutInflater.inflate(layoutResID, activityContainer, true)
+
+       fragmentContainer = fullView.findViewById<View>(R.id.fragment_container) as FrameLayout
+       fragment = supportFragmentManager.findFragmentById(R.id.fragment)!!
+
+
+        super.setContentView(fullView)
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar!!.title = resources.getString(R.string.app_name)
+
+        navigationView = findViewById<NavigationView>(R.id.navigationView)
+        navigationView.setNavigationItemSelectedListener(this)
+
+        val mDrawerToggle = ActionBarDrawerToggle(this, fullView, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+        fullView.addDrawerListener(mDrawerToggle)
+        mDrawerToggle.isDrawerIndicatorEnabled = true
+        mDrawerToggle.syncState()
+
+    }
+
+    override fun onStart() {
+        super.onStart()
+
         auth.addAuthStateListener {
 
             navigationMenu = navigationView.getMenu()
@@ -56,28 +90,15 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         }
     }
 
-    override fun setContentView(layoutResID: Int) {
+    override fun onBackPressed() {
 
-        fullView = layoutInflater.inflate(R.layout.activity_base, null) as DrawerLayout
-        activityContainer = fullView.findViewById<View>(R.id.activity_content) as FrameLayout
-        layoutInflater.inflate(layoutResID, activityContainer, true)
-
-       // fragmentContainer = fullView.findViewById<View>(R.id.fragment_container) as FrameLayout
-
-
-        super.setContentView(fullView)
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-        supportActionBar!!.title = resources.getString(R.string.app_name)
-
-        navigationView = findViewById<NavigationView>(R.id.navigationView)
-        navigationView.setNavigationItemSelectedListener(this)
-
-        val mDrawerToggle = ActionBarDrawerToggle(this, fullView, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        fullView.addDrawerListener(mDrawerToggle)
-        mDrawerToggle.isDrawerIndicatorEnabled = true
-        mDrawerToggle.syncState()
-
+        if (activityContainer.visibility == View.GONE) {
+            activityContainer.visibility = View.VISIBLE
+            fragmentContainer.visibility = View.GONE
+        }
+        else {
+            super.onBackPressed()
+        }
     }
 
 
@@ -109,6 +130,7 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
 
 
            activityContainer.visibility = View.GONE
+           fragmentContainer.visibility = View.VISIBLE
 
            supportFragmentManager.beginTransaction().replace(R.id.fragment, selectedFragment).commit()
 

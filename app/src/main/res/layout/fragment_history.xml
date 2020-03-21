@@ -16,7 +16,10 @@
             android:id="@+id/history_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/history" />
+            android:text="@string/history"
+            android:layout_marginTop="60sp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="20sp"/>
 
         <ListView
             android:id="@+id/history_list"

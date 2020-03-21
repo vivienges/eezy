@@ -14,5 +14,7 @@ data class Ride (
     val total_price: Double
 ){
 
+    constructor() : this((Timestamp(java.util.Date().time)), (Timestamp(java.util.Date().time)), Array(2, {GeoPoint(0.0, 0.0); GeoPoint(0.0, 0.0)}), 0.0, 0.0)
+
 }
 

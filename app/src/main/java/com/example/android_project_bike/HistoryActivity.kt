@@ -18,6 +18,17 @@ class HistoryActivity : AppCompatActivity() {
             "04.03.2020, 12:00-14:12",
             "05.03.2020, 21:33-23:45"
             )
+
+
+
+
+
+
+
+
+
+
+
         adapter = ArrayAdapter(
             applicationContext,
             android.R.layout.simple_list_item_1,

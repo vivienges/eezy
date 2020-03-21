@@ -116,7 +116,6 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
     }
 
 
-
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap

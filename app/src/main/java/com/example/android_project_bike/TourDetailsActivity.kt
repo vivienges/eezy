@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.multidex.MultiDex
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -33,13 +35,78 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_tour_details)
 
         val bundle = intent.getBundleExtra("bundle")
-        val bikeId = bundle.getString("bikeId")
+        bikeId = bundle.getString("bikeId")!!
         val bikeTitle = findViewById<TextView>(R.id.title_label)
         val titleText = resources.getString(R.string.bike) + " " + bikeId
         bikeTitle.text = titleText
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.map) as? SupportMapFragment
+            .findFragmentById(R.id.map_fragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
+
+
+        val pauseRideButton = findViewById<Button>(R.id.pause_bike_button)
+        val returnBikeButton = findViewById<Button>(R.id.return_bike_button)
+
+        returnBikeButton.setOnClickListener {
+
+            //TODO Dialog if the user really wants to rturn the bike
+
+            db.collection("bikes").document("$bikeId")
+                .update(
+                    mapOf(
+                        "available" to true,
+                        "current_user" to "",
+                        "locked" to true
+                    )
+                )
+                .addOnSuccessListener { result ->
+                    Log.d("SUCCESS", "Added $result")
+                }
+                .addOnFailureListener { exception ->
+                    Log.d("ERROR", "Adding data failed!")
+                }
+
+        }
+
+        pauseRideButton.setOnClickListener {
+
+            if (pauseRideButton.text == "Pause Ride") {
+
+                db.collection("bikes").document("$bikeId")
+                    .update(
+                        mapOf(
+                            "locked" to true
+                        )
+                    )
+                    .addOnSuccessListener { result ->
+                        Log.d("SUCCESS", "Added $result")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("ERROR", "Adding data failed!")
+                    }
+                pauseRideButton.text = "Continue Ride"
+                Toast.makeText(this, "Your ride was paused", Toast.LENGTH_LONG).show()
+            }
+
+            else {
+                db.collection("bikes").document("$bikeId")
+                    .update(
+                        mapOf(
+                            "locked" to false
+                        )
+                    )
+                    .addOnSuccessListener { result ->
+                        Log.d("SUCCESS", "Added $result")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("ERROR", "Adding data failed!")
+                    }
+                pauseRideButton.text = "Pause Ride"
+                Toast.makeText(this, "Your ride was continued", Toast.LENGTH_LONG).show()
+
+            }
+        }
+
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -56,7 +123,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     Log.d("DATA", "Current data: ${snapshot.data}")
                     bike = snapshot.toObject(Bike::class.java)!!
 
-                    val info = findViewById<TextView>(R.id.charge_val_label)
+                    val info = findViewById<TextView>(R.id.current_charge_val_label)
                     info.text = "${bike!!.charge}"
 
 

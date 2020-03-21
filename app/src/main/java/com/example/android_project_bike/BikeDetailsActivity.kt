@@ -4,28 +4,18 @@ import android.app.Dialog
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.fragment_timer.*
-import org.w3c.dom.Text
 import android.os.CountDownTimer
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.widget.FrameLayout
 import com.google.firebase.auth.FirebaseAuth
 
@@ -67,8 +57,8 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-        val rentBikeButton = findViewById<Button>(R.id.rent_bike_button)
-        val reserveBikeButton = findViewById<Button>(R.id.reserve_bike_button)
+        val rentBikeButton = findViewById<Button>(R.id.pause_bike_button)
+        val reserveBikeButton = findViewById<Button>(R.id.return_bike_button)
 
         rentBikeButton.setOnClickListener {
 
@@ -86,9 +76,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         val fragment = dialog.findViewById<FrameLayout>(R.id.timer_fragment)
         var timer = fragment.findViewById<TextView>(R.id.timer)
-
-
-        //TODO: User can rent and reserve only one bike
 
         reserveBikeButton.setOnClickListener {
 
@@ -127,6 +114,13 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             }
 
 
+        }
+    }
+
+    override fun onBackPressed() {
+
+        if (dialog.isShowing == false) {
+            super.onBackPressed()
         }
     }
 

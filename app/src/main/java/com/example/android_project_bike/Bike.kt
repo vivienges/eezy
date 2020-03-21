@@ -16,6 +16,4 @@ data class Bike (
 
     }
 
-
-    //override fun toString() = "Bike " + id
 }
