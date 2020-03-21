@@ -174,8 +174,9 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
                         }
                     }
-                val temp = idList.sort()
-               // idList = temp.distinct()
+                idList.sort()
+                idList = idList.distinct().toMutableList()
+                
 
                 if (idList.isEmpty()) {
                     availability.visibility = View.VISIBLE
