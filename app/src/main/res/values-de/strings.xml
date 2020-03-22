@@ -38,4 +38,11 @@
     <string name="question_four">Where can I get some?</string>
     <string name="bike_returned">Du hast das Bike zurückgeben!</string>
     <string name="ok">OK</string>
+    <string name="no">Nein</string>
+    <string name="yes">Ja</string>
+    <string name="use_location">" Möchstest du ihn aktivieren?"</string>
+    <string name="location_off">Dein Standort ist ausgeschaltet!</string>
+    <string name="navigation_drawer_close">Menü schließen</string>
+    <string name="navigation_drawer_open">Menü öffnen</string>
+    <string name="nav_header_desc">Menükopf</string>
 </resources>

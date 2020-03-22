@@ -15,6 +15,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.firebase.firestore.FieldValue
@@ -152,7 +153,9 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
                     val position =
                         LatLng(bike.position.latitude, bike.position.longitude)
-                    mMap.addMarker(MarkerOptions().position(position).title("Bike $bikeId"))
+                    mMap.addMarker(MarkerOptions()
+                        .position(position).title("Bike $bikeId")
+                        .icon(BitmapDescriptorFactory.defaultMarker(82F)))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18F))
 
                 } else {

@@ -21,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import android.os.CountDownTimer
 import android.widget.FrameLayout
 import android.widget.Toast
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.firebase.auth.FirebaseAuth
 
 
@@ -136,15 +137,15 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             bikeReserved = true
 
-
-            //TODO: Scan Code --> Proceed to ScanActivity
-
             val cancelReservationButton = dialog.findViewById<Button>(R.id.cancel_reservation_button)
 
             cancelReservationButton.setOnClickListener {
-                cancelReservation(dialog, timer)
+                cancelReservation(dialog)
                 bikeReserved = false
             }
+
+
+            // Code can only be entered manually
 
             val scanQRCodeButton = dialog.findViewById<Button>(R.id.scan_code_button)
 
@@ -192,7 +193,9 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
                     val position =
                         LatLng(bike.position.latitude, bike.position.longitude)
-                    mMap.addMarker(MarkerOptions().position(position).title("Bike $bikeId"))
+                    mMap.addMarker(MarkerOptions()
+                        .position(position).title("Bike $bikeId")
+                        .icon(BitmapDescriptorFactory.defaultMarker(82F)))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18F))
 
                 } else {
@@ -217,12 +220,11 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             }
 
             override fun onFinish() {
-                cancelReservation(dialog, timer)
+                cancelReservation(dialog)
             }
         }.start()
 
     }
-
 
 
     fun updateTimer(): String {
@@ -245,7 +247,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     }
 
-    fun cancelReservation(dialog: Dialog, timer: TextView) {
+    fun cancelReservation(dialog: Dialog) {
 
         dialog.dismiss()
         countDownTimer.cancel()

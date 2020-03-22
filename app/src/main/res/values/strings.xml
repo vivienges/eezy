@@ -16,10 +16,9 @@
     <string name="charge_level">Level of Charge</string>
     <string name="bike" translatable="false">Bike</string>
     <string name="history">History</string>
-    <string name="title_activity_navigation_drawer">NavigationDrawerActivity</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="navigation_drawer_open">Open Menu</string>
+    <string name="navigation_drawer_close">Close Menu</string>
+    <string name="nav_header_subtitle" translatable="false">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="scan_code">Scan Code</string>
     <string name="cancel">Cancel</string>
@@ -60,6 +59,10 @@
     <string name="max_time" translatable="false">30:00</string>
     <string name="bike_returned">You have returned the bike!</string>
     <string name="ok">OK</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="use_location">Do you want to turn your location on?</string>
+    <string name="location_off">Your location is turned off!</string>
 
 </resources>
 
