@@ -23,10 +23,10 @@ class EnterQrCodeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_qr_code)
 
-        val bundle = intent.getBundleExtra("bundle")
-        val bikeId = bundle?.getString("bikeId")
-        val latitude = intent.getDoubleExtra("latitude", 0.0)
-        val longitude = intent.getDoubleExtra("longitude", 0.0)
+        val bundle = intent.getBundleExtra(BUNDLE)
+        val bikeId = bundle?.getString(BIKE_ID)
+        val latitude = intent.getDoubleExtra(LATITUDE, 0.0)
+        val longitude = intent.getDoubleExtra(LONGITUDE, 0.0)
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
@@ -37,39 +37,39 @@ class EnterQrCodeActivity : AppCompatActivity() {
         enterButton.setOnClickListener {
 
             if (qrCode.text.toString() == bikeId) {
-                db.collection("bikes").document("$bikeId")
+                db.collection(BIKES).document("$bikeId")
                     .update(
                         mapOf(
-                            "available" to false,
-                            "current_user" to currentUser!!.email
+                            AVAILABLE to false,
+                            CURRENT_USER to currentUser!!.email
                         )
                     )
                     .addOnSuccessListener { result ->
                         Log.d("SUCCESS", "Added $result")
                         val rideData = hashMapOf(
-                            "start_time" to FieldValue.serverTimestamp(),
-                            "total_price" to 0,
-                            "total_km" to 0,
-                            "route" to listOf(GeoPoint(latitude, longitude))
+                            START_TIME to FieldValue.serverTimestamp(),
+                            TOTAL_PRICE to 0,
+                            TOTAL_KM to 0,
+                            ROUTE to listOf(GeoPoint(latitude, longitude))
                         )
-                        val userRef = db.collection("users").document(auth.currentUser!!.uid)
-                        val bikeRef = db.collection("bikes").document(bikeId)
+                        val userRef = db.collection(USERS).document(currentUser!!.uid)
+                        val bikeRef = db.collection(BIKES).document(bikeId)
                         db.runBatch {
-                            rideRef = db.collection("rides").document()
+                            rideRef = db.collection(RIDES).document()
                             rideRef.set(rideData)
-                            userRef.update("history", FieldValue.arrayUnion(rideRef))
+                            userRef.update(HISTORY, FieldValue.arrayUnion(rideRef))
                             bikeRef.update(
                                 mapOf(
-                                    "available" to false,
-                                    "locked" to false,
-                                    "current_user" to auth.currentUser!!.email
+                                    AVAILABLE to false,
+                                    LOCKED to false,
+                                    CURRENT_USER to currentUser!!.email
                                 )
                             )
                         }.addOnSuccessListener {
                             Log.d("SUCCESS", "Ride successfully created!")
-                            bundle.putString("rideRefString", rideRef.id)
+                            bundle.putString(RIDE_DEF_STRING, rideRef.id)
                             val intent = Intent(this, TourDetailsActivity::class.java)
-                            intent.putExtra("bundle", bundle)
+                            intent.putExtra(BUNDLE, bundle)
                             startActivity(intent)
                             val finishIntent = Intent(FINISH_ACTIVITY_FLAG)
                             sendBroadcast(finishIntent)
@@ -91,5 +91,21 @@ class EnterQrCodeActivity : AppCompatActivity() {
     }
     companion object {
         const val FINISH_ACTIVITY_FLAG = "finish_activity"
+        const val BIKE_ID = "BIKE_ID"
+        const val BIKES = "bikes"
+        const val USERS = "users"
+        const val RIDES = "rides"
+        const val HISTORY = "history"
+        const val AVAILABLE = "available"
+        const val CURRENT_USER = "current_user"
+        const val LOCKED = "locked"
+        const val BUNDLE = "bundle"
+        const val LONGITUDE = "longitude"
+        const val LATITUDE = "latitude"
+        const val START_TIME = "start_time"
+        const val TOTAL_PRICE = "total_price"
+        const val TOTAL_KM = "total_km"
+        const val ROUTE = "route"
+        const val RIDE_DEF_STRING = "rideRefString"
     }
 }

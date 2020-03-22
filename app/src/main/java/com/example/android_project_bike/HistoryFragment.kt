@@ -55,8 +55,9 @@ class HistoryFragment : Fragment() {
 
 
         auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
 
-        db.collection("users").document(auth.currentUser!!.uid)
+        db.collection(USERS).document(currentUser!!.uid)
             .addSnapshotListener { snapshot, e ->
 
                 if (e != null) {
@@ -73,7 +74,7 @@ class HistoryFragment : Fragment() {
 
                         var startTime = ""
                         val ride = entry.get().addOnSuccessListener { result ->
-                            startTime = result["total_km"].toString()
+                            startTime = result[START_TIME].toString()
                         }
 
                         listItems.add(startTime)
@@ -86,8 +87,11 @@ class HistoryFragment : Fragment() {
                 adapter.notifyDataSetChanged()
             }
 
-        Log.d("TAG", "Fuuuuuuuuu")
         return view
 
+    }
+    companion object {
+        const val USERS = "users"
+        const val START_TIME = "start_time"
     }
 }

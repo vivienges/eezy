@@ -40,9 +40,9 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tour_details)
 
-        val bundle = intent.getBundleExtra("bundle")
+        val bundle = intent.getBundleExtra(BUNDLE)
         bikeId = bundle?.getString(BIKE_ID)!!
-        rideRefString = bundle.getString("rideRefString")!!
+        rideRefString = bundle.getString(RIDE_DEF_STRING)!!
         val bikeTitle = findViewById<TextView>(R.id.title_label)
         val titleText = resources.getString(R.string.bike) + " " + bikeId
         bikeTitle.text = titleText
@@ -58,22 +58,22 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             //TODO Dialog if the user really wants to return the bike
             db.runBatch {
-                db.collection("bikes").document(bikeId)
+                db.collection(BIKES).document(bikeId)
                     .update(
                         mapOf(
-                            "available" to true,
-                            "current_user" to "",
-                            "locked" to true
+                            AVAILABLE to true,
+                            CURRENT_USER to "",
+                            LOCKED to true
                         )
                     )
-                db.collection("rides").document(rideRefString)
-                    .update("end_time", FieldValue.serverTimestamp())
+                db.collection(RIDES).document(rideRefString)
+                    .update(END_TIME, FieldValue.serverTimestamp())
             }
             var totalPrice: Long
-            db.collection("rides").document(rideRefString)
+            db.collection(RIDES).document(rideRefString)
                 .get()
                 .addOnSuccessListener { result ->
-                    totalPrice = result["total_price"] as Long
+                    totalPrice = result[TOTAL_PRICE] as Long
                     val confirmationText = "$totalPrice SEK"
                     dialog = Dialog(this)
                     dialog.setCanceledOnTouchOutside(false)
@@ -93,12 +93,12 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         pauseRideButton.setOnClickListener {
 
-            if (pauseRideButton.text == "Pause Ride") {
+            if (pauseRideButton.text == resources.getString(R.string.pause_ride)) {
 
-                db.collection("bikes").document(bikeId)
+                db.collection(BIKES).document(bikeId)
                     .update(
                         mapOf(
-                            "locked" to true
+                            LOCKED to true
                         )
                     )
                     .addOnSuccessListener { result ->
@@ -112,10 +112,10 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
             }
 
             else {
-                db.collection("bikes").document(bikeId)
+                db.collection(BIKES).document(bikeId)
                     .update(
                         mapOf(
-                            "locked" to false
+                            LOCKED to false
                         )
                     )
                     .addOnSuccessListener { result ->
@@ -135,7 +135,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
-        db.collection("bikes").document(bikeId)
+        db.collection(BIKES).document(bikeId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("FAIL", "Listen failed.", e)
@@ -163,6 +163,15 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
     }
 
     companion object {
-        const val BIKE_ID = "BIKE_ID"
+            const val BIKE_ID = "BIKE_ID"
+            const val BIKES = "bikes"
+            const val RIDES = "rides"
+            const val AVAILABLE = "available"
+            const val CURRENT_USER = "current_user"
+            const val LOCKED = "locked"
+            const val BUNDLE = "bundle"
+            const val END_TIME = "end_time"
+            const val TOTAL_PRICE = "total_price"
+            const val RIDE_DEF_STRING = "rideRefString"
     }
 }

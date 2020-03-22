@@ -47,7 +47,6 @@ class LoginActivity : AppCompatActivity() {
         login_button.setOnClickListener() {
 
             var email = findViewById<EditText>(R.id.email_login)
-
             var password = findViewById<EditText>(R.id.password_login)
 
             auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
@@ -55,8 +54,9 @@ class LoginActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("SUCCESS", "signInWithEmail:success")
-                        val user = auth.currentUser
-                        loggedIn = user != null
+                        val currentUser = auth.currentUser
+                        loggedIn = currentUser != null
+                        Toast.makeText(this, "Welcome, ${currentUser!!.email}", Toast.LENGTH_LONG).show()
 
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
@@ -99,7 +99,6 @@ class LoginActivity : AppCompatActivity() {
         createAccount.setOnClickListener {
 
             val intent = Intent(this, CreateAccountActivity::class.java)
-           // intent.putExtra("bundle", bundle)
             startActivity(intent)
         }
 
@@ -138,12 +137,12 @@ class LoginActivity : AppCompatActivity() {
                     if (task.result!!.additionalUserInfo!!.isNewUser) {
                         val user = auth.currentUser
                         val userDocument = db
-                            .collection("users")
+                            .collection(USERS)
                             .document(user!!.uid)
                         val userInfo = hashMapOf(
-                            "email" to user.email,
-                            "payment" to 0,
-                            "history" to emptyList<DocumentReference>()
+                            EMAIL to user.email,
+                            PAYMENT to 0,
+                            HISTORY to emptyList<DocumentReference>()
                         )
                         userDocument.set(userInfo)
                             .addOnSuccessListener { result ->
@@ -171,20 +170,12 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-
-
-
-
-/*    override fun onStart() {
-        super.onStart()
-
-        // Check for existing Google Sign In account, if the user is already signed in
-// the GoogleSignInAccount will be non-null.
-        val account = GoogleSignIn.getLastSignedInAccount(this)
-       // updateUI(account)
+    companion object {
+        const val USERS = "users"
+        const val EMAIL = "email"
+        const val PAYMENT = "payment"
+        const val HISTORY = "history"
     }
-
-*/
 }
 
 

@@ -34,20 +34,20 @@
             android:layout_width="match_parent"
             android:layout_height="100sp"
             android:checked="true"
-            android:text="PayPal"
+            android:text="@string/paypal"
             />
 
         <RadioButton
             android:id="@+id/radio_2"
             android:layout_width="match_parent"
             android:layout_height="100sp"
-            android:text="Credit Card" />
+            android:text="@string/credit_card" />
 
         <RadioButton
             android:id="@+id/radio_3"
             android:layout_width="match_parent"
             android:layout_height="100sp"
-            android:text="Google Pay" />
+            android:text="@string/googlepay" />
     </RadioGroup>
 
     <Button
@@ -55,7 +55,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/complete_signup"
+        android:text="@string/complete"
         android:textColor="@color/colorButtonText"
         android:background="@drawable/custom_button_states"
         android:layout_gravity="center_horizontal"/>

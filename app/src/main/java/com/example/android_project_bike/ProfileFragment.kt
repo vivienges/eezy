@@ -33,11 +33,12 @@ class ProfileFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser
 
         val email = view.findViewById<TextView>(R.id.email_value)
         val payment = view.findViewById<TextView>(R.id.payment_value)
 
-        db.collection("users").document(auth.currentUser!!.uid)
+        db.collection(USERS).document(currentUser!!.uid)
             .addSnapshotListener { snapshot, e ->
 
                 if (e != null) {
@@ -53,9 +54,9 @@ class ProfileFragment : Fragment() {
                     email.text = user.email
 
                     when(user.payment) {
-                        1 -> payment.text = "Paypal"
-                        2 -> payment.text = "Credit Card"
-                        3 -> payment.text = "GooglePay"
+                        1 -> payment.text = resources.getString(R.string.paypal)
+                        2 -> payment.text = resources.getString(R.string.credit_card)
+                        3 -> payment.text = resources.getString(R.string.googlepay)
                     }
 
                 } else {
@@ -67,6 +68,10 @@ class ProfileFragment : Fragment() {
 
 
         return view
+    }
+
+    companion object {
+        const val USERS = "users"
     }
 
 }

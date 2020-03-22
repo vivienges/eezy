@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="You have returned the bike!"
+        android:text="@string/bike_returned"
         android:gravity="center_horizontal"
         android:textSize="20sp"
         />
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/custom_button_states"
             android:textColor="@color/colorButtonText"
-            android:text="OK"
+            android:text="@string/ok"
             android:layout_marginStart="4sp"
             />
 

@@ -70,13 +70,13 @@ class CreateAccountActivity : AppCompatActivity() {
                     editEmail.setError("Please enter a valid Email address")
                     emailValidated = false
                 } else if (emailExists(emailInput)) {
-                    editEmail.setError("email is already used")
+                    editEmail.setError("Email is already used")
 
                 } else {
                     editEmail.setError(null)
                     email = emailInput
                     emailValidated = true
-                    bundle.putString("email", email)
+                    bundle.putString(EMAIL, email)
                 }
 
                 validateInput()
@@ -141,7 +141,7 @@ class CreateAccountActivity : AppCompatActivity() {
                     passwordConfirmation.setError(null)
                     password = passwordConfirmationInput
                     passwordConfirmationValidated = true
-                    bundle.putString("password", password)
+                    bundle.putString(PASSWORD, password)
 
 
                 }
@@ -162,7 +162,7 @@ class CreateAccountActivity : AppCompatActivity() {
         })
 
 
-        db.collection("users")
+        db.collection(USERS)
             .get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -180,7 +180,7 @@ class CreateAccountActivity : AppCompatActivity() {
         addPaymentButton.setOnClickListener {
 
             val intent = Intent(this, AddPaymentActivity::class.java)
-            intent.putExtra("bundle", bundle)
+            intent.putExtra(BUNDLE, bundle)
             startActivity(intent)
         }
 
@@ -208,6 +208,13 @@ class CreateAccountActivity : AppCompatActivity() {
             addPaymentButton.isEnabled = false
         }
         Log.d("Check", "$emailValidated + $passwordValidated + $passwordConfirmationValidated")
+    }
+
+    companion object {
+        const val BUNDLE = "bundle"
+        const val USERS = "users"
+        const val EMAIL = "email"
+        const val PASSWORD = "password"
     }
 
 }

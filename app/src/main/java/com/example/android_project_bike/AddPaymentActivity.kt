@@ -24,9 +24,9 @@ class AddPaymentActivity : AppCompatActivity() {
 
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
         val intent = intent
-        val bundle = intent.getBundleExtra("bundle")
-        val email = bundle.getString("email")
-        val password = bundle.getString("password")
+        val bundle = intent.getBundleExtra(BUNDLE)
+        val email = bundle.getString(EMAIL)
+        val password = bundle.getString(PASSWORD)
 
         auth = FirebaseAuth.getInstance()
 
@@ -46,10 +46,10 @@ class AddPaymentActivity : AppCompatActivity() {
 
             if (auth.currentUser != null) {
 
-                db.collection("users").document(auth.currentUser!!.uid)
+                db.collection(USERS).document(auth.currentUser!!.uid)
                     .update(
                         mapOf(
-                            "payment" to payment
+                            PAYMENT to payment
                         )
                     )
                     .addOnSuccessListener { result ->
@@ -60,7 +60,7 @@ class AddPaymentActivity : AppCompatActivity() {
                     }
 
                 val intent = Intent(this, EnterQrCodeActivity::class.java)
-                intent.putExtra("bundle", bundle)
+                intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
                 finish()
             }
@@ -76,12 +76,12 @@ class AddPaymentActivity : AppCompatActivity() {
                             Log.d("SUCCESS", "createUserWithEmail:success")
                             val currentUser = auth.currentUser
                             val userDocument = db
-                                .collection("users")
+                                .collection(USERS)
                                 .document(currentUser!!.uid)
                             val userInfo = hashMapOf(
-                                "email" to currentUser.email,
-                                "payment" to payment,
-                                "history" to emptyList<DocumentReference>()
+                                EMAIL to currentUser.email,
+                                PAYMENT to payment,
+                                HISTORY to emptyList<DocumentReference>()
                             )
                             userDocument.set(userInfo)
                                 .addOnSuccessListener { result ->
@@ -90,6 +90,7 @@ class AddPaymentActivity : AppCompatActivity() {
                                 .addOnFailureListener { exception ->
                                     Log.d("ERROR", "Adding data failed!")
                                 }
+                            Toast.makeText(this, "Welcome, ${currentUser!!.email}", Toast.LENGTH_LONG).show()
                             val intent = Intent(this, MainActivity::class.java)
                             startActivity(intent)
                             finish()
@@ -105,5 +106,13 @@ class AddPaymentActivity : AppCompatActivity() {
                     }
             }
         }
+    }
+    companion object {
+        const val BUNDLE = "bundle"
+        const val EMAIL = "email"
+        const val PASSWORD = "password"
+        const val PAYMENT = "payment"
+        const val HISTORY = "history"
+        const val USERS = "users"
     }
 }

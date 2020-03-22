@@ -21,7 +21,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="0sp"
         android:layout_weight="35"
         android:orientation="vertical"
         android:gravity="center_horizontal"
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="25sp"
-        android:text="Bike XX"/>
+        android:text="@string/bike_id"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -78,28 +78,24 @@
                 android:id="@+id/distance_var_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0.0 km" />
+                android:text="@string/distance_value" />
 
             <TextView
                 android:id="@+id/price_var_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0.0 SEK" />
+                android:text="@string/price_value" />
 
             <TextView
                 android:id="@+id/current_charge_val_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="100%" />
+                android:text="@string/charge_value" />
 
 
         </LinearLayout>
 
         </LinearLayout>
-
-
-
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -109,23 +105,23 @@
 
             <Button
                 android:id="@+id/pause_bike_button"
-                android:layout_width="0dp"
+                android:layout_width="0sp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:background="@drawable/custom_button_default"
                 android:textColor="@color/colorButtonText"
-                android:text="Pause Ride"
+                android:text="@string/pause_ride"
                 android:layout_marginEnd="4sp"
                 />
 
             <Button
                 android:id="@+id/return_bike_button"
-                android:layout_width="0dp"
+                android:layout_width="0sp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:background="@drawable/custom_button_default"
                 android:textColor="@color/colorButtonText"
-                android:text="Return Bike"
+                android:text="@string/return_bike"
                 android:layout_marginStart="4sp"
                 />
 

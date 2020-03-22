@@ -28,6 +28,7 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
     private lateinit var availability: TextView
     lateinit var bike: Bike
     private var loggedIn = false
+    private lateinit var bikeString: String
 
 
     override fun attachBaseContext(base: Context) {
@@ -41,6 +42,7 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
         auth = FirebaseAuth.getInstance()
         bike = Bike()
+        bikeString =  resources.getString(R.string.bike)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
@@ -101,7 +103,7 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
         var markers = mutableListOf<Marker>()
 
-        db.collection("bikes")
+        db.collection(BIKES)
             .addSnapshotListener { snapshots, e ->
                 if (e == null && snapshots != null)
                 //TODO: Add error handling
@@ -114,15 +116,15 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                                 val position =
                                     LatLng(bike.position.latitude, bike.position.longitude)
                                 var marker =
-                                    mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document.id}"))
+                                    mMap.addMarker(MarkerOptions().position(position).title("$bikeString ${documentChange.document.id}"))
                                 markers.add(marker)
 
                                 if (bike.available) {
 
-                                    idList.add("Bike " + documentChange.document.id)
+                                    idList.add("$bikeString ${documentChange.document.id}")
 
                                 } else {
-                                    markers.first { it.title == "Bike ${documentChange.document.id}" }
+                                    markers.first { it.title == "$bikeString ${documentChange.document.id}" }
                                         .isVisible = false
                                 }
                             }
@@ -131,20 +133,20 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                                 bike = documentChange.document.toObject(Bike::class.java)
 
                                 if (bike.available) {
-                                    if (("Bike " + documentChange.document.id) !in idList)
-                                        idList.add("Bike " + documentChange.document.id)
+                                    if (("$bikeString ${documentChange.document.id}") !in idList)
+                                        idList.add("$bikeString ${documentChange.document.id}")
 
-                                    markers.first { it.title == "Bike ${documentChange.document.id}" }
+                                    markers.first { it.title == "$bikeString ${documentChange.document.id}" }
                                         .isVisible = true
 
                                 } else {
-                                    idList.remove("Bike " + documentChange.document.id)
-                                    markers.first { it.title == "Bike ${documentChange.document.id}" }
+                                    idList.remove("$bikeString ${documentChange.document.id}")
+                                    markers.first { it.title == "$bikeString ${documentChange.document.id}" }
                                         .isVisible = false
                                 }
                             }
                             DocumentChange.Type.REMOVED ->
-                                idList.remove("Bike " + documentChange.document.id)
+                                idList.remove("$bikeString + ${documentChange.document.id}")
                         }
                     }
                 idList.sort()
@@ -163,8 +165,8 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
     companion object {
         const val BIKE_ID = "BIKE_ID"
+        const val BIKES = "bikes"
         const val BUNDLE = "bundle"
-
     }
 }
 

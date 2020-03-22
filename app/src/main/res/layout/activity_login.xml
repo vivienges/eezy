@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     tools:context=".LoginActivity"
-    android:background="@color/colorBackground">
+    >
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -30,9 +30,9 @@
         android:id="@+id/email_login"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="60dp"
-        android:layout_marginEnd="60dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="60sp"
+        android:layout_marginEnd="60sp"
+        android:layout_marginBottom="8sp"
         android:ems="10"
         android:hint="@string/email"
         android:inputType="textPersonName" />
@@ -79,12 +79,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/sign_in_option"
-           android:paddingStart="8dp"
-           android:paddingEnd="8dp"/>
+           android:paddingStart="8sp"
+           android:paddingEnd="8sp"/>
 
 
-       <View android:layout_height="1dp"
-               android:layout_width="60dp"
+       <View android:layout_height="1sp"
+               android:layout_width="60sp"
                android:background="@android:color/darker_gray"
            android:layout_gravity="center"></View>
 
@@ -95,14 +95,14 @@
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
-            android:layout_marginStart="60dp"
-            android:layout_marginEnd="60dp"
+            android:layout_marginStart="60sp"
+            android:layout_marginEnd="60sp"
             >
 
                 <Button
                     android:id="@+id/createAccount"
                     android:layout_width="wrap_content"
-                    android:layout_height="45dp"
+                    android:layout_height="45sp"
                     android:text="@string/create_account"
                     android:textSize="12sp"
                     android:background="@drawable/custom_button_states"
@@ -113,7 +113,7 @@
                 <com.google.android.gms.common.SignInButton
                     android:id="@+id/sign_in_button"
                     android:layout_width="wrap_content"
-                    android:layout_height="45dp"
+                    android:layout_height="45sp"
                      />
 
         </LinearLayout>

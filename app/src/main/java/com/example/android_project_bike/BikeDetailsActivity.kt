@@ -60,12 +60,10 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
 
-        Log.d("USER", "${currentUser!!.email}")
-
         bike = Bike()
 
         val intent = intent
-        val bundle = intent.getBundleExtra("bundle")
+        val bundle = intent.getBundleExtra(BUNDLE)
         bikeId = bundle?.getString(BIKE_ID)!!
 
         val bikeTitle = findViewById<TextView>(R.id.bike_label)
@@ -81,7 +79,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         rentBikeButton.setOnClickListener {
 
-            db.collection("users").document(currentUser.uid)
+            db.collection(USERS).document(currentUser!!.uid)
                 .addSnapshotListener { snapshot, e ->
                     if (e != null) {
                         Log.w("FAIL", "Listen failed.", e)
@@ -96,12 +94,10 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
                         if (payment == 0) {
 
-                            Log.d("PAYMENT", "$payment")
-
                             val intent = Intent(this, AddPaymentActivity::class.java)
-                            intent.putExtra("bundle", bundle)
-                            intent.putExtra("latitude", bike.position.latitude)
-                            intent.putExtra("longitude", bike.position.longitude)
+                            intent.putExtra(BUNDLE, bundle)
+                            intent.putExtra(LATITUDE, bike.position.latitude)
+                            intent.putExtra(LONGITUDE, bike.position.longitude)
                             startActivity(intent)
 
                         }
@@ -109,9 +105,9 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                         else {
 
                             val intent = Intent(this, EnterQrCodeActivity::class.java)
-                            intent.putExtra("bundle", bundle)
-                            intent.putExtra("latitude", bike.position.latitude)
-                            intent.putExtra("longitude", bike.position.longitude)
+                            intent.putExtra(BUNDLE, bundle)
+                            intent.putExtra(LATITUDE, bike.position.latitude)
+                            intent.putExtra(LONGITUDE, bike.position.longitude)
                             startActivity(intent)
                         }
 
@@ -135,11 +131,11 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             dialog.show()
             startStopTimer(timer)
 
-            db.collection("bikes").document(bikeId)
+            db.collection(BIKES).document(bikeId)
                 .update(
                     mapOf(
-                        "available" to false,
-                        "current_user" to currentUser.email
+                        AVAILABLE to false,
+                        CURRENT_USER to currentUser!!.email
                     )
                 )
                 .addOnSuccessListener { result ->
@@ -169,7 +165,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             scanQRCodeButton.setOnClickListener {
                 val intent = Intent(this, EnterQrCodeActivity::class.java)
-                intent.putExtra("bundle", bundle)
+                intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
             }
 
@@ -194,7 +190,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
-        db.collection("bikes").document(bikeId)
+        db.collection(BIKES).document(bikeId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("FAIL", "Listen failed.", e)
@@ -202,7 +198,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                 }
 
                 if (snapshot != null && snapshot.exists()) {
-                    Log.d("DATA", "Current data: ${snapshot.data}")
+
                     bike = snapshot.toObject(Bike::class.java)!!
 
                     val info = findViewById<TextView>(R.id.charge_val_label)
@@ -271,11 +267,11 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         timeLeftInMilliSec = MAX_RESERVATION_TIME
 
 
-        db.collection("bikes").document(bikeId)
+        db.collection(BIKES).document(bikeId)
             .update(
                 mapOf(
-                    "available" to true,
-                    "current_user" to ""
+                    AVAILABLE to true,
+                    CURRENT_USER to ""
                 )
             )
             .addOnSuccessListener { result ->
@@ -288,8 +284,15 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     companion object {
         const val BIKE_ID = "BIKE_ID"
+        const val BIKES = "bikes"
+        const val USERS = "users"
+        const val AVAILABLE = "available"
+        const val CURRENT_USER = "current_user"
         const val FINISH_ACTIVITY_FLAG = "finish_activity"
         const val MAX_RESERVATION_TIME = 1800000.toLong()
+        const val BUNDLE = "bundle"
+        const val LONGITUDE = "longitude"
+        const val LATITUDE = "latitude"
     }
 
 }

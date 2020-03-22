@@ -5,12 +5,11 @@
     android:layout_height="wrap_content"
     tools:context=".TimerFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:id="@+id/timer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="30:00"
-        android:textSize="20sp"/>
+        android:textSize="20sp"
+        android:text=""/>
 
 </FrameLayout>

@@ -1,34 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:showIn="navigation_view"
-   >
+    tools:showIn="navigation_view">
 <group android:checkableBehavior="single">
         <item
             android:id="@+id/menu_profile"
             android:icon="@drawable/ic_profile"
-            android:title="Profile" />
+            android:title="@string/profile" />
         <item
             android:id="@+id/menu_history"
             android:icon="@drawable/ic_history"
-            android:title="History" />
+            android:title="@string/history" />
         <item
             android:id="@+id/menu_howtoride"
             android:icon="@drawable/ic_howtoride"
-            android:title="How to Ride" />
+            android:title="@string/how_to_ride" />
         <item
             android:id="@+id/menu_help"
             android:icon="@drawable/ic_help"
-            android:title="Help" />
+            android:title="@string/help" />
         <item
-        android:id="@+id/menu_sign_out"
-        android:icon="@drawable/ic_signout"
-        android:title="Sign Out"
-        android:visible="false"/>
+            android:id="@+id/menu_sign_out"
+            android:icon="@drawable/ic_signout"
+            android:title="@string/sign_out"
+            android:visible="false"/>
         <item
             android:id="@+id/menu_sign_in"
             android:icon="@drawable/ic_signin"
-            android:title="Sign In"
+            android:title="@string/sign_in"
             android:visible="true"/>
 </group>
 </menu>
