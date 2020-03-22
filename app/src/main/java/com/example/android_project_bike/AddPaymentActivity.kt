@@ -54,20 +54,19 @@ class AddPaymentActivity : AppCompatActivity() {
                     )
                     .addOnSuccessListener { result ->
                         Log.d("SUCCESS", "Added $result")
+                        val intent = Intent(this, EnterQrCodeActivity::class.java)
+                        intent.putExtra("bundle", bundle)
+                        startActivity(intent)
+                        finish()
                     }
                     .addOnFailureListener { exception ->
                         Log.d("ERROR", "Adding data failed!")
                     }
-
-                val intent = Intent(this, EnterQrCodeActivity::class.java)
-                intent.putExtra("bundle", bundle)
-                startActivity(intent)
-                finish()
             }
 
             else {
 
-                val user = User("$email", "$password", payment, emptyList<DocumentReference>())
+                val user = User("$email", "$password", payment, emptyList())
 
                 auth.createUserWithEmailAndPassword(user.email, user.password)
                     .addOnCompleteListener(this) { task ->

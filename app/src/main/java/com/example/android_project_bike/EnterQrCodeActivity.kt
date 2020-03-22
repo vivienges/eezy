@@ -24,7 +24,7 @@ class EnterQrCodeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_enter_qr_code)
 
         val bundle = intent.getBundleExtra("bundle")
-        val bikeId = bundle?.getString("bikeId")
+        val bikeId = bundle?.getString("BIKE_ID")
         val latitude = intent.getDoubleExtra("latitude", 0.0)
         val longitude = intent.getDoubleExtra("longitude", 0.0)
 

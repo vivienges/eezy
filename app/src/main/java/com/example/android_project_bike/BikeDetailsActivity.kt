@@ -37,8 +37,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     private lateinit var countDownTimer: CountDownTimer
     private var timeLeftInMilliSec = MAX_RESERVATION_TIME
     private var bikeReserved = false
-    private lateinit var user: User
-    private var payment = 0
     private lateinit var broadcastReceiver: BroadcastReceiver
 
 
@@ -82,20 +80,13 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         rentBikeButton.setOnClickListener {
 
             db.collection("users").document(currentUser.uid)
-                .addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.w("FAIL", "Listen failed.", e)
-                        return@addSnapshotListener
-                    }
+                .get()
+                .addOnSuccessListener { result ->
+                    if (result.data != null) {
+                        Log.d("DATA", "Current data: ${result.data}")
+                        val payment = result["payment"]
 
-                    if (snapshot != null && snapshot.exists()) {
-                        Log.d("DATA", "Current data: ${snapshot.data}")
-                        user = snapshot.toObject(User::class.java)!!
-
-                        payment = user.payment
-
-                        if (payment == 0) {
-
+                        if (payment == 0.toLong()) {
                             Log.d("PAYMENT", "$payment")
 
                             val intent = Intent(this, AddPaymentActivity::class.java)
@@ -104,9 +95,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                             intent.putExtra("longitude", bike.position.longitude)
                             startActivity(intent)
 
-                        }
-
-                        else {
+                        } else {
 
                             val intent = Intent(this, EnterQrCodeActivity::class.java)
                             intent.putExtra("bundle", bundle)
@@ -114,10 +103,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                             intent.putExtra("longitude", bike.position.longitude)
                             startActivity(intent)
                         }
-
-
-                    } else {
-                        Log.d("NULL", "Current data: null")
                     }
                 }
         }
@@ -150,10 +135,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                 }
 
             bikeReserved = true
-
-            /*if (bikeReserved) {
-                reserveBikeButton.text = getString(R.string.view_reservation)
-            }*/
 
 
             //TODO: Scan Code --> Proceed to ScanActivity
