@@ -84,6 +84,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     dialog.show()
                     val okButton = dialog.ok_button
                     okButton.setOnClickListener{
+                        dialog.dismiss()
                         finish()
                     }
                 }

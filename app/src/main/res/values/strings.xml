@@ -6,7 +6,7 @@
     <string name="email">Email</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="add_payment">Add Payment Method</string>
-    <string name="complete_signup">Complete Sign Up</string>
+    <string name="complete_signup">Complete</string>
     <string name="rent_bike">Rent Bike</string>
     <string name="reserve_bike">Reserve Bike</string>
     <string name="sign_in_option">Don\'t have an account?</string>

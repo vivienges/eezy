@@ -7,7 +7,7 @@
     <string name="email">Email</string>
     <string name="confirm_password">Passwort bestätigen</string>
     <string name="add_payment">Bezahlungsart hinzufügen</string>
-    <string name="complete_signup">Anmeldung abschließen</string>
+    <string name="complete_signup">Fertig</string>
     <string name="rent_bike">Fahrrad leihen</string>
     <string name="reserve_bike">Fahrrad reservieren</string>
     <string name="sign_in_option">Noch keinen Account?</string>

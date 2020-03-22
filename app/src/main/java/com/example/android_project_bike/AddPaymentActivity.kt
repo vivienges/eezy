@@ -28,8 +28,6 @@ class AddPaymentActivity : AppCompatActivity() {
         setContentView(R.layout.activity_add_payment)
 
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
-
-
         val intent = intent
         val bundle = intent.getBundleExtra("bundle")
         val email = bundle.getString("email")
@@ -43,9 +41,7 @@ class AddPaymentActivity : AppCompatActivity() {
         confirmSignup.setOnClickListener {
 
             val radioButton = radioGroup.checkedRadioButtonId
-
             var payment = 0
-            val list = emptyList<DocumentReference>()
 
             when (radioButton) {
                 R.id.radio_1 -> payment = 1
@@ -53,43 +49,66 @@ class AddPaymentActivity : AppCompatActivity() {
                 R.id.radio_3 -> payment = 3
             }
 
-            val user = User("$email", "$password", payment, emptyList<DocumentReference>())
+            if (auth.currentUser != null) {
 
-            auth.createUserWithEmailAndPassword(user.email, user.password)
-                .addOnCompleteListener(this) { task ->
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d("SUCCESS", "createUserWithEmail:success")
-                        val currentUser = auth.currentUser
-                        val userDocument = db
-                            .collection("users")
-                            .document(currentUser!!.uid)
-                        val userInfo = hashMapOf(
-                            "email" to currentUser.email,
-                            "payment" to payment,
-                            "history" to emptyList<DocumentReference>()
+                db.collection("users").document(auth.currentUser!!.uid)
+                    .update(
+                        mapOf(
+                            "payment" to payment
                         )
-                        userDocument.set(userInfo)
-                            .addOnSuccessListener { result ->
-                                Log.d("SUCCESS", "Added $result")
-                            }
-                            .addOnFailureListener { exception ->
-                                Log.d("ERROR", "Adding data failed!")
-                            }
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
-                        finish()
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w("ERROR", "createUserWithEmail:failure", task.exception)
-                        Toast.makeText(
-                            baseContext, "Authentication failed.",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    )
+                    .addOnSuccessListener { result ->
+                        Log.d("SUCCESS", "Added $result")
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.d("ERROR", "Adding data failed!")
                     }
 
-                }
+                val intent = Intent(this, EnterQrCodeActivity::class.java)
+                intent.putExtra("bundle", bundle)
+                startActivity(intent)
+                finish()
+            }
 
+            else {
+
+                val user = User("$email", "$password", payment, emptyList<DocumentReference>())
+
+                auth.createUserWithEmailAndPassword(user.email, user.password)
+                    .addOnCompleteListener(this) { task ->
+                        if (task.isSuccessful) {
+                            // Sign in success, update UI with the signed-in user's information
+                            Log.d("SUCCESS", "createUserWithEmail:success")
+                            val currentUser = auth.currentUser
+                            val userDocument = db
+                                .collection("users")
+                                .document(currentUser!!.uid)
+                            val userInfo = hashMapOf(
+                                "email" to currentUser.email,
+                                "payment" to payment,
+                                "history" to emptyList<DocumentReference>()
+                            )
+                            userDocument.set(userInfo)
+                                .addOnSuccessListener { result ->
+                                    Log.d("SUCCESS", "Added $result")
+                                }
+                                .addOnFailureListener { exception ->
+                                    Log.d("ERROR", "Adding data failed!")
+                                }
+                            val intent = Intent(this, MainActivity::class.java)
+                            startActivity(intent)
+                            finish()
+                        } else {
+                            // If sign in fails, display a message to the user.
+                            Log.w("ERROR", "createUserWithEmail:failure", task.exception)
+                            Toast.makeText(
+                                baseContext, "Authentication failed.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    }
+            }
         }
     }
 }

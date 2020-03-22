@@ -39,13 +39,14 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     private var bikeReserved = false
     private lateinit var user: User
     private var payment = 0
+    private lateinit var broadcastReceiver: BroadcastReceiver
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_details)
 
-        val broadcastReceiver = object : BroadcastReceiver() {
+        broadcastReceiver = object : BroadcastReceiver() {
 
             override fun onReceive(arg0: Context, intent: Intent) {
                 val action = intent.action
@@ -75,8 +76,8 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
 
-        val rentBikeButton = findViewById<Button>(R.id.pause_bike_button)
-        val reserveBikeButton = findViewById<Button>(R.id.return_bike_button)
+        val rentBikeButton = findViewById<Button>(R.id.rent_bike_button)
+        val reserveBikeButton = findViewById<Button>(R.id.reserve_bike_button)
 
         rentBikeButton.setOnClickListener {
 
@@ -93,23 +94,32 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
                         payment = user.payment
 
+                        if (payment == 0) {
+
+                            Log.d("PAYMENT", "$payment")
+
+                            val intent = Intent(this, AddPaymentActivity::class.java)
+                            intent.putExtra("bundle", bundle)
+                            intent.putExtra("latitude", bike.position.latitude)
+                            intent.putExtra("longitude", bike.position.longitude)
+                            startActivity(intent)
+
+                        }
+
+                        else {
+
+                            val intent = Intent(this, EnterQrCodeActivity::class.java)
+                            intent.putExtra("bundle", bundle)
+                            intent.putExtra("latitude", bike.position.latitude)
+                            intent.putExtra("longitude", bike.position.longitude)
+                            startActivity(intent)
+                        }
+
+
                     } else {
                         Log.d("NULL", "Current data: null")
                     }
                 }
-
-            if (payment == 0) {
-
-                val intent = Intent(this, AddPaymentActivity::class.java)
-                startActivity(intent)
-
-            }
-
-            val intent = Intent(this, EnterQrCodeActivity::class.java)
-            intent.putExtra("bundle", bundle)
-            intent.putExtra("latitude", bike.position.latitude)
-            intent.putExtra("longitude", bike.position.longitude)
-            startActivity(intent)
         }
 
         dialog = Dialog(this)
