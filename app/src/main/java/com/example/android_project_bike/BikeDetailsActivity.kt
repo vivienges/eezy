@@ -66,7 +66,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         val intent = intent
         val bundle = intent.getBundleExtra("bundle")
-        bikeId = bundle?.getString("bikeId")!!
+        bikeId = bundle?.getString(BIKE_ID)!!
 
         val bikeTitle = findViewById<TextView>(R.id.bike_label)
         val bikeText = "Bike $bikeId"
@@ -225,12 +225,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         unregisterReceiver(broadcastReceiver)
     }
 
-    companion object {
-        const val EXTRA_BIKE_ID = "BIKE_ID"
-        const val FINISH_ACTIVITY_FLAG = "finish_activity"
-        const val MAX_RESERVATION_TIME = 1800000.toLong()
-    }
-
     fun startStopTimer(timer: TextView) {
 
         countDownTimer = object : CountDownTimer(timeLeftInMilliSec, 1000) {
@@ -290,6 +284,12 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             .addOnFailureListener { exception ->
                 Log.d("ERROR", "Adding data failed!")
             }
+    }
+
+    companion object {
+        const val BIKE_ID = "BIKE_ID"
+        const val FINISH_ACTIVITY_FLAG = "finish_activity"
+        const val MAX_RESERVATION_TIME = 1800000.toLong()
     }
 
 }

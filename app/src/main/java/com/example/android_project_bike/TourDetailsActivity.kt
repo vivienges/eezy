@@ -41,7 +41,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_tour_details)
 
         val bundle = intent.getBundleExtra("bundle")
-        bikeId = bundle?.getString("bikeId")!!
+        bikeId = bundle?.getString(BIKE_ID)!!
         rideRefString = bundle.getString("rideRefString")!!
         val bikeTitle = findViewById<TextView>(R.id.title_label)
         val titleText = resources.getString(R.string.bike) + " " + bikeId
@@ -163,6 +163,6 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
     }
 
     companion object {
-        const val EXTRA_BIKE_ID = "BIKE_ID"
+        const val BIKE_ID = "BIKE_ID"
     }
 }

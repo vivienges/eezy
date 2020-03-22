@@ -46,19 +46,12 @@ class CreateAccountActivity : AppCompatActivity() {
         MultiDex.install(this)
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_account)
 
         auth = FirebaseAuth.getInstance()
-
-        val intent = intent
-        //val bundle = intent.getBundleExtra("bundle")
         var bundle = Bundle()
-
-
 
         val editEmail = findViewById<EditText>(R.id.email_input)
         addPaymentButton = findViewById<Button>(R.id.add_payment_button)
@@ -67,7 +60,6 @@ class CreateAccountActivity : AppCompatActivity() {
 
         editEmail.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-
 
                 var emailInput = editEmail.editableText.toString().trim()
 

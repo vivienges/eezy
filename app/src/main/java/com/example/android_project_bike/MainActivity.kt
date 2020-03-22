@@ -1,7 +1,6 @@
 package com.example.android_project_bike
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -9,48 +8,28 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kotlinx.android.synthetic.main.fragment_map.*
 import android.content.Context
-import android.util.Log
 import androidx.multidex.MultiDex
-import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.android.synthetic.main.activity_main.*
-import com.google.android.gms.maps.CameraUpdate
-import com.google.android.gms.maps.model.CameraPosition
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.android.gms.maps.model.Marker
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.core.view.isVisible
-import androidx.drawerlayout.widget.DrawerLayout
-import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 
-
 class MainActivity : BaseActivity(), OnMapReadyCallback {
-
 
     private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
     private lateinit var mMap: GoogleMap
-    lateinit var adapter : ArrayAdapter<String>
-    private var idList= mutableListOf<String>()
+    lateinit var adapter: ArrayAdapter<String>
+    private var idList = mutableListOf<String>()
     private lateinit var listView: ListView
-    private lateinit var availability : TextView
+    private lateinit var availability: TextView
     lateinit var bike: Bike
     private var loggedIn = false
 
 
-    // Set up multidex for this activity
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(this)
@@ -60,9 +39,7 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         auth = FirebaseAuth.getInstance()
-
         bike = Bike()
 
         val mapFragment = supportFragmentManager
@@ -87,20 +64,19 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
         listView.setOnItemClickListener { parent, view, position, id ->
 
             val itemText = listView.getItemAtPosition(position).toString().replace("[^0-9]".toRegex(), "")
-            bundle.putString("bikeId", itemText)
+            bundle.putString(BIKE_ID, itemText)
 
             if (loggedIn != true) {
 
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                intent.putExtra("bundle", bundle)
+                intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
 
             } else {
 
                 val intent = Intent(this@MainActivity, BikeDetailsActivity::class.java)
-                intent.putExtra("bundle", bundle)
+                intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
-
             }
 
         }
@@ -135,18 +111,19 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
                                 bike = documentChange.document.toObject(Bike::class.java)
 
-                                val position = LatLng(bike.position.latitude, bike.position.longitude)
-                                var marker = mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document.id}"))
+                                val position =
+                                    LatLng(bike.position.latitude, bike.position.longitude)
+                                var marker =
+                                    mMap.addMarker(MarkerOptions().position(position).title("Bike ${documentChange.document.id}"))
                                 markers.add(marker)
 
                                 if (bike.available) {
 
                                     idList.add("Bike " + documentChange.document.id)
 
-                                }
-
-                                else {
-                                    markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = false
+                                } else {
+                                    markers.first { it.title == "Bike ${documentChange.document.id}" }
+                                        .isVisible = false
                                 }
                             }
                             DocumentChange.Type.MODIFIED -> {
@@ -154,21 +131,20 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                                 bike = documentChange.document.toObject(Bike::class.java)
 
                                 if (bike.available) {
-                                    if ( ("Bike " + documentChange.document.id) !in idList)
+                                    if (("Bike " + documentChange.document.id) !in idList)
                                         idList.add("Bike " + documentChange.document.id)
 
-                                    markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = true
+                                    markers.first { it.title == "Bike ${documentChange.document.id}" }
+                                        .isVisible = true
 
-                                }
-
-                                else {
+                                } else {
                                     idList.remove("Bike " + documentChange.document.id)
-                                    markers.first { it.title == "Bike ${documentChange.document.id}"}.isVisible = false
+                                    markers.first { it.title == "Bike ${documentChange.document.id}" }
+                                        .isVisible = false
                                 }
                             }
                             DocumentChange.Type.REMOVED ->
                                 idList.remove("Bike " + documentChange.document.id)
-
                         }
                     }
                 idList.sort()
@@ -177,9 +153,7 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                 if (idList.isEmpty()) {
                     availability.visibility = View.VISIBLE
                     listView.visibility = View.GONE
-                }
-
-                else {
+                } else {
                     availability.visibility = View.GONE
                     listView.visibility = View.VISIBLE
                 }
@@ -188,7 +162,9 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
     }
 
     companion object {
-        const val EXTRA_BIKE_ID = "BIKE_ID"
+        const val BIKE_ID = "BIKE_ID"
+        const val BUNDLE = "bundle"
+
     }
 }
 
