@@ -37,8 +37,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     private lateinit var countDownTimer: CountDownTimer
     private var timeLeftInMilliSec = MAX_RESERVATION_TIME
     private var bikeReserved = false
-    private lateinit var user: User
-    private var payment = 0
     private lateinit var broadcastReceiver: BroadcastReceiver
 
 
@@ -79,20 +77,15 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         rentBikeButton.setOnClickListener {
 
-            db.collection(USERS).document(currentUser!!.uid)
-                .addSnapshotListener { snapshot, e ->
-                    if (e != null) {
-                        Log.w("FAIL", "Listen failed.", e)
-                        return@addSnapshotListener
-                    }
+            db.collection(USERS).document(currentUser.uid)
+                .get()
+                .addOnSuccessListener { result ->
+                    if (result.data != null) {
+                        Log.d("DATA", "Current data: ${result.data}")
+                        val payment = result[PAYMENT]
 
-                    if (snapshot != null && snapshot.exists()) {
-                        Log.d("DATA", "Current data: ${snapshot.data}")
-                        user = snapshot.toObject(User::class.java)!!
-
-                        payment = user.payment
-
-                        if (payment == 0) {
+                        if (payment == 0.toLong()) {
+                            Log.d("PAYMENT", "$payment")
 
                             val intent = Intent(this, AddPaymentActivity::class.java)
                             intent.putExtra(BUNDLE, bundle)
@@ -110,10 +103,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                             intent.putExtra(LONGITUDE, bike.position.longitude)
                             startActivity(intent)
                         }
-
-
-                    } else {
-                        Log.d("NULL", "Current data: null")
                     }
                 }
         }
@@ -146,10 +135,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                 }
 
             bikeReserved = true
-
-            /*if (bikeReserved) {
-                reserveBikeButton.text = getString(R.string.view_reservation)
-            }*/
 
 
             //TODO: Scan Code --> Proceed to ScanActivity
@@ -293,6 +278,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         const val BUNDLE = "bundle"
         const val LONGITUDE = "longitude"
         const val LATITUDE = "latitude"
+        const val PAYMENT = "payment"
     }
 
 }
