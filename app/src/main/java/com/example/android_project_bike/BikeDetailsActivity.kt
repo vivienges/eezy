@@ -77,7 +77,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         rentBikeButton.setOnClickListener {
 
-            db.collection(USERS).document(currentUser.uid)
+            db.collection(USERS).document(currentUser!!.uid)
                 .get()
                 .addOnSuccessListener { result ->
                     if (result.data != null) {
