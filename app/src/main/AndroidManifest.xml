@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-   xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android_project_bike"
     android:versionCode="1"
     android:versionName="1.0">
+
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -27,7 +28,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,icon,theme,label">
-        <activity android:name=".HistoryActivity"></activity>
+        <service
+            android:name=".HistoryService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity android:name=".HistoryActivity" />
         <activity android:name=".TourDetailsActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -52,8 +58,8 @@
         <uses-library android:name="com.google.android.maps" />
 
         <activity android:name=".BikeDetailsActivity" />
-        <activity android:name=".EnterQrCode"/>
-        <activity android:name=".BaseActivity"/>
+        <activity android:name=".EnterQrCodeActivity" />
+        <activity android:name=".BaseActivity" />
         <activity android:name=".CreateAccountActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".AddPaymentActivity" />

@@ -25,4 +25,5 @@
     <string name="no_bikes_available">Momentan sind leider keine Fahrräder verfügbar</string>
     <string name="continue_ride">Fahrt fortsetzen</string>
     <string name="view_reservation">View reservation</string>
+    <string name="deposit_warning">Folgender Betrag wird von Ihrem Konto abgebucht:</string>
 </resources>

@@ -8,21 +8,23 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 
-class EnterQrCode : AppCompatActivity() {
+class EnterQrCodeActivity : AppCompatActivity() {
 
     private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
+    private lateinit var rideRef: DocumentReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_enter_qr_code)
 
         val bundle = intent.getBundleExtra("bundle")
-        val bikeId = bundle.getString("bikeId")
+        val bikeId = bundle?.getString("bikeId")
         val latitude = intent.getDoubleExtra("latitude", 0.0)
         val longitude = intent.getDoubleExtra("longitude", 0.0)
 
@@ -35,7 +37,6 @@ class EnterQrCode : AppCompatActivity() {
         enterButton.setOnClickListener {
 
             if (qrCode.text.toString() == bikeId) {
-
                 db.collection("bikes").document("$bikeId")
                     .update(
                         mapOf(
@@ -52,11 +53,11 @@ class EnterQrCode : AppCompatActivity() {
                             "route" to listOf(GeoPoint(latitude, longitude))
                         )
                         val userRef = db.collection("users").document(auth.currentUser!!.uid)
-                        val bikeRef = db.collection("bikes").document(bikeId!!)
+                        val bikeRef = db.collection("bikes").document(bikeId)
                         db.runBatch {
-                            val ride = db.collection("rides").document()
-                            ride.set(rideData)
-                            userRef.update("history", FieldValue.arrayUnion(ride))
+                            rideRef = db.collection("rides").document()
+                            rideRef.set(rideData)
+                            userRef.update("history", FieldValue.arrayUnion(rideRef))
                             bikeRef.update(
                                 mapOf(
                                     "available" to false,
@@ -65,19 +66,21 @@ class EnterQrCode : AppCompatActivity() {
                                 )
                             )
                         }.addOnSuccessListener {
-                            Log.d("SUCCESS", "")
+                            Log.d("SUCCESS", "Ride successfully created!")
+                            bundle.putString("rideRefString", rideRef.id)
+                            val intent = Intent(this, TourDetailsActivity::class.java)
+                            intent.putExtra("bundle", bundle)
+                            startActivity(intent)
+                            val finishIntent = Intent(FINISH_ACTIVITY_FLAG)
+                            sendBroadcast(finishIntent)
+                            finish()
+                            Toast.makeText(this, "You booked the bike", Toast.LENGTH_LONG).show()
                         }
 
                     }
                     .addOnFailureListener { exception ->
-                        Log.d("ERROR", "Adding data failed!")
+                        Log.d("ERROR", "Adding data failed: ", exception)
                     }
-
-                val intent = Intent(this, TourDetailsActivity::class.java)
-                intent.putExtra("bundle", bundle)
-                startActivity(intent)
-                finish()
-                Toast.makeText(this, "You booked the bike", Toast.LENGTH_LONG).show()
             }
 
             else {
@@ -85,5 +88,8 @@ class EnterQrCode : AppCompatActivity() {
             }
 
         }
+    }
+    companion object {
+        const val FINISH_ACTIVITY_FLAG = "finish_activity"
     }
 }

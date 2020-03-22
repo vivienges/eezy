@@ -1,7 +1,10 @@
 package com.example.android_project_bike
 
 import android.app.Dialog
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -42,6 +45,17 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_details)
 
+        val broadcastReceiver = object : BroadcastReceiver() {
+
+            override fun onReceive(arg0: Context, intent: Intent) {
+                val action = intent.action
+                if (action == FINISH_ACTIVITY_FLAG) {
+                    finish()
+                }
+            }
+        }
+        registerReceiver(broadcastReceiver, IntentFilter(FINISH_ACTIVITY_FLAG))
+
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
 
@@ -51,7 +65,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         val intent = intent
         val bundle = intent.getBundleExtra("bundle")
-        bikeId = bundle.getString("bikeId")!!
+        bikeId = bundle?.getString("bikeId")!!
 
         val bikeTitle = findViewById<TextView>(R.id.bike_label)
         val bikeText = "Bike $bikeId"
@@ -91,7 +105,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             }
 
-            val intent = Intent(this, EnterQrCode::class.java)
+            val intent = Intent(this, EnterQrCodeActivity::class.java)
             intent.putExtra("bundle", bundle)
             intent.putExtra("latitude", bike.position.latitude)
             intent.putExtra("longitude", bike.position.longitude)
@@ -100,18 +114,18 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         dialog = Dialog(this)
         dialog.setCanceledOnTouchOutside(false)
-        dialog.setContentView(R.layout.custom_popup)
+        dialog.setContentView(R.layout.reservation_popup)
         dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         val fragment = dialog.findViewById<FrameLayout>(R.id.timer_fragment)
-        var timer = fragment.findViewById<TextView>(R.id.timer)
+        val timer = fragment.findViewById<TextView>(R.id.timer)
 
         reserveBikeButton.setOnClickListener {
 
             dialog.show()
             startStopTimer(timer)
 
-            db.collection("bikes").document("$bikeId")
+            db.collection("bikes").document(bikeId)
                 .update(
                     mapOf(
                         "available" to false,
@@ -144,7 +158,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             val scanQRCodeButton = dialog.findViewById<Button>(R.id.scan_code_button)
 
             scanQRCodeButton.setOnClickListener {
-                val intent = Intent(this, EnterQrCode::class.java)
+                val intent = Intent(this, EnterQrCodeActivity::class.java)
                 intent.putExtra("bundle", bundle)
                 startActivity(intent)
             }
@@ -155,11 +169,14 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     override fun onBackPressed() {
 
-        if (bikeReserved == false) {
+        if (!bikeReserved) {
             super.onBackPressed()
         }
         else {
-            Toast.makeText(this, "You can't leave this page if you have an ongoing reservation", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "You can't leave this page if you have an ongoing reservation",
+                Toast.LENGTH_LONG).show()
         }
     }
 
@@ -167,7 +184,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
-        db.collection("bikes").document("$bikeId")
+        db.collection("bikes").document(bikeId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("FAIL", "Listen failed.", e)
@@ -179,11 +196,11 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     bike = snapshot.toObject(Bike::class.java)!!
 
                     val info = findViewById<TextView>(R.id.charge_val_label)
-                    info.text = "${bike!!.charge}"
+                    info.text = "${bike.charge}"
 
 
                     val position =
-                        LatLng(bike.position!!.latitude, bike.position!!.longitude)
+                        LatLng(bike.position.latitude, bike.position.longitude)
                     mMap.addMarker(MarkerOptions().position(position).title("Bike $bikeId"))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18F))
 
@@ -193,9 +210,14 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(broadcastReceiver)
+    }
 
     companion object {
         const val EXTRA_BIKE_ID = "BIKE_ID"
+        const val FINISH_ACTIVITY_FLAG = "finish_activity"
         const val MAX_RESERVATION_TIME = 1800000.toLong()
     }
 
@@ -219,21 +241,21 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
 
     fun updateTimer(): String {
-        var minutes = timeLeftInMilliSec / 60000 as Int
-        var seconds = timeLeftInMilliSec % 60000 / 1000 as Int
-        var timeLeft: String
+        val minutes = timeLeftInMilliSec / 60000
+        val seconds = timeLeftInMilliSec % 60000 / 1000
+        val timeLeft: String
         var min = minutes.toString()
         var sec = seconds.toString()
 
         if (seconds < 10) {
-            sec = "0" + sec
+            sec = "0$sec"
         }
 
         if (minutes < 10) {
-            min = "0" + min
+            min = "0$min"
         }
 
-        timeLeft = "$min :" + " $sec"
+        timeLeft = "$min : $sec"
         return timeLeft
 
     }
@@ -245,7 +267,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         timeLeftInMilliSec = MAX_RESERVATION_TIME
 
 
-        db.collection("bikes").document("$bikeId")
+        db.collection("bikes").document(bikeId)
             .update(
                 mapOf(
                     "available" to true,

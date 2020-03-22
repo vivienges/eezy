@@ -33,6 +33,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="continue_ride">Continue Ride</string>
     <string name="view_reservation">View reservation</string>
+    <string name="deposit_warning">Following amount will be deposited from your account:</string>
 
 </resources>
 

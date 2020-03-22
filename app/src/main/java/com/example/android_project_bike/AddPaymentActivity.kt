@@ -53,19 +53,19 @@ class AddPaymentActivity : AppCompatActivity() {
                 R.id.radio_3 -> payment = 3
             }
 
-            var user = User("$email", "$password", payment, emptyList<DocumentReference>())
+            val user = User("$email", "$password", payment, emptyList<DocumentReference>())
 
             auth.createUserWithEmailAndPassword(user.email, user.password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("SUCCESS", "createUserWithEmail:success")
-                        val user = auth.currentUser
+                        val currentUser = auth.currentUser
                         val userDocument = db
                             .collection("users")
-                            .document(user!!.uid)
+                            .document(currentUser!!.uid)
                         val userInfo = hashMapOf(
-                            "email" to user.email,
+                            "email" to currentUser.email,
                             "payment" to payment,
                             "history" to emptyList<DocumentReference>()
                         )
@@ -77,7 +77,6 @@ class AddPaymentActivity : AppCompatActivity() {
                                 Log.d("ERROR", "Adding data failed!")
                             }
                         val intent = Intent(this, MainActivity::class.java)
-                        //intent.putExtra("bundle", bundle)
                         startActivity(intent)
                         finish()
                     } else {

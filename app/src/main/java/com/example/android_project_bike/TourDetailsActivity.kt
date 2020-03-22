@@ -1,7 +1,10 @@
 package com.example.android_project_bike
 
+import android.app.Dialog
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -14,8 +17,9 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import org.w3c.dom.Text
+import kotlinx.android.synthetic.main.return_popup.*
 
 class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
@@ -24,6 +28,8 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
     lateinit var bike: Bike
     lateinit var bikeId: String
+    lateinit var rideRefString: String
+    lateinit var dialog: Dialog
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
@@ -35,7 +41,8 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_tour_details)
 
         val bundle = intent.getBundleExtra("bundle")
-        bikeId = bundle.getString("bikeId")!!
+        bikeId = bundle?.getString("bikeId")!!
+        rideRefString = bundle.getString("rideRefString")!!
         val bikeTitle = findViewById<TextView>(R.id.title_label)
         val titleText = resources.getString(R.string.bike) + " " + bikeId
         bikeTitle.text = titleText
@@ -49,21 +56,36 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
         returnBikeButton.setOnClickListener {
 
-            //TODO Dialog if the user really wants to rturn the bike
-
-            db.collection("bikes").document("$bikeId")
-                .update(
-                    mapOf(
-                        "available" to true,
-                        "current_user" to "",
-                        "locked" to true
+            //TODO Dialog if the user really wants to return the bike
+            db.runBatch {
+                db.collection("bikes").document(bikeId)
+                    .update(
+                        mapOf(
+                            "available" to true,
+                            "current_user" to "",
+                            "locked" to true
+                        )
                     )
-                )
+                db.collection("rides").document(rideRefString)
+                    .update("end_time", FieldValue.serverTimestamp())
+            }
+            var totalPrice: Long
+            db.collection("rides").document(rideRefString)
+                .get()
                 .addOnSuccessListener { result ->
-                    Log.d("SUCCESS", "Added $result")
-                }
-                .addOnFailureListener { exception ->
-                    Log.d("ERROR", "Adding data failed!")
+                    totalPrice = result["total_price"] as Long
+                    val confirmationText = "$totalPrice SEK"
+                    dialog = Dialog(this)
+                    dialog.setCanceledOnTouchOutside(false)
+                    dialog.setCancelable(false)
+                    dialog.setContentView(R.layout.return_popup)
+                    dialog.final_price_label.text = confirmationText
+                    dialog.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                    dialog.show()
+                    val okButton = dialog.ok_button
+                    okButton.setOnClickListener{
+                        finish()
+                    }
                 }
 
         }
@@ -72,7 +94,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
             if (pauseRideButton.text == "Pause Ride") {
 
-                db.collection("bikes").document("$bikeId")
+                db.collection("bikes").document(bikeId)
                     .update(
                         mapOf(
                             "locked" to true
@@ -89,7 +111,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
             }
 
             else {
-                db.collection("bikes").document("$bikeId")
+                db.collection("bikes").document(bikeId)
                     .update(
                         mapOf(
                             "locked" to false
@@ -112,7 +134,7 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
-        db.collection("bikes").document("$bikeId")
+        db.collection("bikes").document(bikeId)
             .addSnapshotListener { snapshot, e ->
                 if (e != null) {
                     Log.w("FAIL", "Listen failed.", e)
@@ -124,11 +146,11 @@ class TourDetailsActivity : BaseActivity(), OnMapReadyCallback {
                     bike = snapshot.toObject(Bike::class.java)!!
 
                     val info = findViewById<TextView>(R.id.current_charge_val_label)
-                    info.text = "${bike!!.charge}"
+                    info.text = "${bike.charge}"
 
 
                     val position =
-                        LatLng(bike.position!!.latitude, bike.position!!.longitude)
+                        LatLng(bike.position.latitude, bike.position.longitude)
                     mMap.addMarker(MarkerOptions().position(position).title("Bike $bikeId"))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18F))
 
