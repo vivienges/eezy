@@ -1,18 +1,15 @@
 package com.example.android_project_bike
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import kotlinx.android.synthetic.main.activity_login.*
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import androidx.core.content.ContextCompat.getSystemService
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.util.Log
 import android.widget.EditText
 import android.widget.TextView
@@ -29,10 +26,11 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
 
-    private var db = FirebaseFirestore.getInstance()
-    val RC_SIGN_IN: Int = 1
-    lateinit var mGoogleSignInClient: GoogleSignInClient
+    private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var auth: FirebaseAuth
+    private lateinit var finishReceiver: BroadcastReceiver
+    private var db = FirebaseFirestore.getInstance()
+    private val RC_SIGN_IN: Int = 1
     private var loggedIn = false
 
 
@@ -40,72 +38,72 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
+        finishReceiver = object : BroadcastReceiver() {
+            override fun onReceive(arg0: Context, intent: Intent) {
+                val action = intent.action
+                if (action == FINISH_LOGIN_ACTIVITIES) {
+                    finish()
+                }
+            }
+        }
+        registerReceiver(finishReceiver, IntentFilter(FINISH_LOGIN_ACTIVITIES))
+
         auth = FirebaseAuth.getInstance()
 
-        val login_button = findViewById<Button>(R.id.login_button)
+        val loginButton = findViewById<Button>(R.id.login_button)
 
-        login_button.setOnClickListener() {
-
-            var email = findViewById<EditText>(R.id.email_login)
-            var password = findViewById<EditText>(R.id.password_login)
+        loginButton.setOnClickListener {
+            val email = findViewById<EditText>(R.id.email_login)
+            val password = findViewById<EditText>(R.id.password_login)
 
             auth.signInWithEmailAndPassword(email.text.toString(), password.text.toString())
-                .addOnCompleteListener(this){ task ->
+                .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d("SUCCESS", "signInWithEmail:success")
                         val currentUser = auth.currentUser
                         loggedIn = currentUser != null
-                        Toast.makeText(this, "Welcome, ${currentUser!!.email}", Toast.LENGTH_LONG).show()
-
-                        val intent = Intent(this, MainActivity::class.java)
-                        startActivity(intent)
+                        Toast.makeText(
+                            this,
+                            "${resources.getString(R.string.welcome)}, ${currentUser!!.email}",
+                            Toast.LENGTH_LONG
+                        ).show()
                         finish()
 
                     } else {
                         // If sign in fails, display a message to the user.
                         Log.w("FAIL", "signInWithEmail:failure", task.exception)
-                        Toast.makeText(baseContext, "Authentication failed.",
-                            Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            baseContext, resources.getString(R.string.authentication_error),
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
-
                 }
-
-
         }
 
 
         val googleSignIn = findViewById<SignInButton>(R.id.sign_in_button)
-
         val textView = googleSignIn.getChildAt(0) as TextView
-        textView.text = "LOGIN"
+        textView.text = resources.getString(R.string.login_google)
 
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
+            .build()
 
-            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
 
-            mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
-
-
-
-            googleSignIn.setOnClickListener {
-                signIn()
-            }
-
+        googleSignIn.setOnClickListener {
+            signIn()
+        }
 
         val createAccount = findViewById<Button>(R.id.createAccount)
 
         createAccount.setOnClickListener {
-
             val intent = Intent(this, CreateAccountActivity::class.java)
             startActivity(intent)
         }
-
-
-
-        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -116,7 +114,11 @@ class LoginActivity : AppCompatActivity() {
                 firebaseAuthWithGoogle(account!!)
             } catch (e: ApiException) {
                 Log.d("ERROR", e.toString())
-                Toast.makeText(this, "Google sign in failed :(", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    this,
+                    resources.getString(R.string.google_signin_error),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -155,14 +157,13 @@ class LoginActivity : AppCompatActivity() {
 
                         val intent = Intent(this, AddPaymentActivity::class.java)
                         startActivity(intent)
-
                         Log.d("INFO", "New user created: " + acct.displayName)
                     }
-                    Toast.makeText(this, "Welcome, ${acct.displayName}", Toast.LENGTH_LONG).show()
-
-
-                    val intent = Intent(this, MainActivity::class.java)
-                    startActivity(intent)
+                    Toast.makeText(
+                        this,
+                        "${resources.getString(R.string.welcome)}, ${acct.displayName}",
+                        Toast.LENGTH_LONG
+                    ).show()
                     finish()
                 } else {
                     // If sign in fails, display a message to the user.
@@ -172,6 +173,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val FINISH_LOGIN_ACTIVITIES = "finish_login_activities"
         const val USERS = "users"
         const val EMAIL = "email"
         const val PAYMENT = "payment"

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">eezy</string>
     <string name="login">Login</string>
+    <string name="login_google">LOGIN</string>
     <string name="create_account">Create Account</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
@@ -15,6 +16,18 @@
     <string name="current_price">Current Price</string>
     <string name="charge_level">Level of Charge</string>
     <string name="bike" translatable="false">Bike</string>
+    <string name="welcome" >Welcome</string>
+    <string name="field_empty_error" >"Field can't be empty"</string>
+    <string name="mail_invalid_error" >"Please enter a valid Email address"</string>
+    <string name="mail_duplicate_error" >"Email is already used"</string>
+    <string name="password_weak_error" >"Password too weak"</string>
+    <string name="password_mismatch_error" >"Password is not the same"</string>
+    <string name="google_signin_error" >"Google sign in failed :("</string>
+    <string name="provider_enabled" >"The Provider was enabled"</string>
+    <string name="provider_disabled" >"The Provider was disabled"</string>
+    <string name="bike_booked" >"You booked the bike"</string>
+    <string name="wrong_code" >"You entered the wrong code"</string>
+    <string name="authentication_error" >"Authentication failed."</string>
     <string name="history">History</string>
     <string name="navigation_drawer_open">Open Menu</string>
     <string name="navigation_drawer_close">Close Menu</string>
@@ -24,10 +37,10 @@
     <string name="cancel">Cancel</string>
     <string name="reservation">The bike is reserved for</string>
     <string name="pause_ride">Pause Ride</string>
+    <string name="ride_paused">Your ride was paused</string>
+    <string name="ride_continued">Your ride was continued</string>
     <string name="return_bike">Return bike</string>
     <string name="no_bikes_available">There are currently no bikes available</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="continue_ride">Continue Ride</string>
     <string name="view_reservation">View reservation</string>
     <string name="deposit_warning">Following amount will be deposited from your account:</string>
@@ -63,6 +76,11 @@
     <string name="no">No</string>
     <string name="use_location">Do you want to turn your location on?</string>
     <string name="location_off">Your location is turned off!</string>
+    <string name="charge">charge</string>
+    <string name="distance">distance</string>
+    <string name="price">price</string>
+    <string name="stay_on_page">You can\'t leave this page if you have an ongoing reservation</string>
+    <string name="bike_status" translatable="false">Bike Status</string>
 
 </resources>
 

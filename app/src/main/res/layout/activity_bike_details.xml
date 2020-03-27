@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".BikeDetailsActivity">
+    tools:context=".BikeDetailsActivity" >
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <fragment
             android:id="@+id/map_fragment"
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="0sp"
             android:layout_weight="65" />
-
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="0sp"
             android:layout_marginStart="60sp"
             android:layout_marginEnd="60sp"
             android:layout_weight="35"
@@ -35,7 +35,6 @@
                 android:id="@+id/bike_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="20sp"
                 android:text="@string/bike_id"
                 android:textSize="25sp" />
 
@@ -43,8 +42,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16sp"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -56,8 +54,13 @@
                         android:id="@+id/charge_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/charge_level"
-                        android:textSize="15sp" />
+                        android:text="@string/charge_level" />
+
+                    <TextView
+                        android:id="@+id/status_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/bike_status" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -68,24 +71,21 @@
                     <TextView
                         android:id="@+id/charge_val_label"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="15sp" />
+                        android:layout_height="wrap_content" />
 
                     <TextView
                         android:id="@+id/availability_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/availability"
-                        android:textSize="15sp"></TextView>
-
+                        android:text="@string/availability" />
 
                 </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
                 android:layout_marginBottom="32sp"
                 android:orientation="horizontal">
 
@@ -94,6 +94,7 @@
                     android:layout_width="0sp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="4sp"
+                    android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:background="@drawable/custom_button_states"
                     android:text="@string/rent_bike"
@@ -101,14 +102,14 @@
 
                 <Button
                     android:id="@+id/reserve_bike_button"
-                    android:layout_width="0dp"
+                    android:layout_width="0sp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4sp"
+                    android:layout_gravity="center_vertical"
                     android:layout_weight="1"
                     android:background="@drawable/custom_button_states"
                     android:text="@string/reserve_bike"
                     android:textColor="@color/colorButtonText" />
-
 
             </LinearLayout>
 

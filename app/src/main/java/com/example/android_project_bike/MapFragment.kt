@@ -29,17 +29,14 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
         map.onCreate(savedInstanceState)
         map.onResume()
-
         map.getMapAsync(this)
     }
 
     override fun onMapReady(map: GoogleMap?) {
-map?.let {
-    googleMap = it
-
-}
+        map?.let {
+            googleMap = it
+        }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,8 +45,6 @@ map?.let {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_map, container, false)
     }
-
-
 
     /**
      * This interface must be implemented by activities that contain this

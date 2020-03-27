@@ -45,4 +45,23 @@
     <string name="navigation_drawer_close">Menü schließen</string>
     <string name="navigation_drawer_open">Menü öffnen</string>
     <string name="nav_header_desc">Menükopf</string>
+    <string name="charge">Akku</string>
+    <string name="distance">Distanz</string>
+    <string name="price">Preis</string>
+    <string name="stay_on_page">Sie müssen wegen der Reservierung auf dieser Seite bleiben</string>
+    <string name="welcome">Willkommen</string>
+    <string name="login_google">EINLOGGEN</string>
+    <string name="mail_duplicate_error">Email existiert bereits</string>
+    <string name="mail_invalid_error">Bitte eine valide Email eingeben</string>
+    <string name="password_mismatch_error">Passwort ist nicht identisch</string>
+    <string name="password_weak_error">Passwort zu schwach</string>
+    <string name="wrong_code">Code gehört nicht zum Fahrrad</string>
+    <string name="field_empty_error">Feld darf nicht leer sein</string>
+    <string name="bike_booked">Das Fahrrad wurde gebucht</string>
+    <string name="authentication_error">Authentifizierung fehlgeschlagen.</string>
+    <string name="google_signin_error">Google Sign In fehlgeschlagen :(</string>
+    <string name="provider_disabled">Der Provider wurde deaktiviert</string>
+    <string name="provider_enabled">Der Provider wurde aktiviert</string>
+    <string name="ride_continued">Die Fahrt wurde wieder aufgenommen</string>
+    <string name="ride_paused">Die Fahrt wurde pausiert</string>
 </resources>

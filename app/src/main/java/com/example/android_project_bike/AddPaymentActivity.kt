@@ -25,8 +25,8 @@ class AddPaymentActivity : AppCompatActivity() {
         val radioGroup = findViewById<RadioGroup>(R.id.radioGroup)
         val intent = intent
         val bundle = intent.getBundleExtra(BUNDLE)
-        val email = bundle.getString(EMAIL)
-        val password = bundle.getString(PASSWORD)
+        val email = bundle?.getString(EMAIL)
+        val password = bundle?.getString(PASSWORD)
 
         auth = FirebaseAuth.getInstance()
 
@@ -66,9 +66,9 @@ class AddPaymentActivity : AppCompatActivity() {
 
             else {
 
-                val user = User("$email", "$password", payment, emptyList())
+                val user = User("$email", payment, emptyList())
 
-                auth.createUserWithEmailAndPassword(user.email, user.password)
+                auth.createUserWithEmailAndPassword(user.email, password!!)
                     .addOnCompleteListener(this) { task ->
                         if (task.isSuccessful) {
                             // Sign in success, update UI with the signed-in user's information
@@ -89,9 +89,8 @@ class AddPaymentActivity : AppCompatActivity() {
                                 .addOnFailureListener { exception ->
                                     Log.d("ERROR", "Adding data failed!")
                                 }
-                            Toast.makeText(this, "Welcome, ${currentUser!!.email}", Toast.LENGTH_LONG).show()
-                            val intent = Intent(this, MainActivity::class.java)
-                            startActivity(intent)
+                            val finishIntent = Intent(FINISH_LOGIN_ACTIVITIES)
+                            sendBroadcast(finishIntent)
                             finish()
                         } else {
                             // If sign in fails, display a message to the user.
@@ -107,6 +106,7 @@ class AddPaymentActivity : AppCompatActivity() {
         }
     }
     companion object {
+        const val FINISH_LOGIN_ACTIVITIES = "finish_login_activities"
         const val BUNDLE = "bundle"
         const val EMAIL = "email"
         const val PASSWORD = "password"

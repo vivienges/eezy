@@ -16,20 +16,14 @@ import org.w3c.dom.Text
 
 class ProfileFragment : Fragment() {
 
-    private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
-    lateinit var user: User
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
+    private lateinit var user: User
+    private var db = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val view = inflater.inflate(R.layout.fragment_profile, container, false)
 
         auth = FirebaseAuth.getInstance()
@@ -40,20 +34,17 @@ class ProfileFragment : Fragment() {
 
         db.collection(USERS).document(currentUser!!.uid)
             .addSnapshotListener { snapshot, e ->
-
                 if (e != null) {
                     Log.w("FAIL", "Listen failed.", e)
                     return@addSnapshotListener
                 }
-
-
                 if (snapshot != null && snapshot.exists()) {
                     Log.d("DATA", "Current data: ${snapshot.data}")
                     user = snapshot.toObject(User::class.java)!!
 
                     email.text = user.email
 
-                    when(user.payment) {
+                    when (user.payment) {
                         1 -> payment.text = resources.getString(R.string.paypal)
                         2 -> payment.text = resources.getString(R.string.credit_card)
                         3 -> payment.text = resources.getString(R.string.googlepay)
@@ -62,11 +53,7 @@ class ProfileFragment : Fragment() {
                 } else {
                     Log.d("NULL", "Current data: null")
                 }
-
             }
-
-
-
         return view
     }
 

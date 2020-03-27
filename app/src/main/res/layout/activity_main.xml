@@ -5,48 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".MainActivity"
-   >
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
-    <fragment
-        android:id="@+id/map_fragment"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:layout_weight="3"
-/>
-
-    <LinearLayout
-        android:id="@+id/available_bikes"
-        android:layout_width="match_parent"
-        android:layout_height="0sp"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:gravity="center">
-
-     <ListView
-            android:id="@+id/list_view"
+        <fragment
+            android:id="@+id/map_fragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="0sp"
+            android:layout_weight="3" />
+
+        <LinearLayout
+            android:id="@+id/available_bikes"
+            android:layout_width="match_parent"
+            android:layout_height="0sp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/list_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
 
-        <TextView
-            android:id="@+id/bikes_availability_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/no_bikes_available"
-            android:layout_gravity="center_horizontal"
-            android:visibility="gone"
-            />
+            <TextView
+                android:id="@+id/bikes_availability_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/no_bikes_available"
+                android:visibility="gone" />
 
-    </LinearLayout>
-
+        </LinearLayout>
 
     </LinearLayout>
 

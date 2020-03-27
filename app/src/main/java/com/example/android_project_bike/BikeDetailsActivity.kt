@@ -27,7 +27,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
 
-    lateinit var mMap: GoogleMap
+    private lateinit var mMap: GoogleMap
 
     private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
@@ -36,25 +36,24 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
     private lateinit var bikeId: String
     private lateinit var dialog: Dialog
     private lateinit var countDownTimer: CountDownTimer
+    private lateinit var finishReceiver: BroadcastReceiver
     private var timeLeftInMilliSec = MAX_RESERVATION_TIME
     private var bikeReserved = false
-    private lateinit var broadcastReceiver: BroadcastReceiver
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bike_details)
 
-        broadcastReceiver = object : BroadcastReceiver() {
-
+        finishReceiver = object : BroadcastReceiver() {
             override fun onReceive(arg0: Context, intent: Intent) {
                 val action = intent.action
-                if (action == FINISH_ACTIVITY_FLAG) {
+                if (action == FINISH_BIKE_ACTIVITY) {
                     finish()
                 }
             }
         }
-        registerReceiver(broadcastReceiver, IntentFilter(FINISH_ACTIVITY_FLAG))
+        registerReceiver(finishReceiver, IntentFilter(FINISH_BIKE_ACTIVITY))
 
         auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser
@@ -66,7 +65,7 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         bikeId = bundle?.getString(BIKE_ID)!!
 
         val bikeTitle = findViewById<TextView>(R.id.bike_label)
-        val bikeText = "Bike $bikeId"
+        val bikeText = "${resources.getString(R.string.bike)} $bikeId"
         bikeTitle.text = bikeText
 
         val mapFragment = supportFragmentManager
@@ -77,7 +76,6 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         val reserveBikeButton = findViewById<Button>(R.id.reserve_bike_button)
 
         rentBikeButton.setOnClickListener {
-
             db.collection(USERS).document(currentUser!!.uid)
                 .get()
                 .addOnSuccessListener { result ->
@@ -93,11 +91,8 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                             intent.putExtra(LATITUDE, bike.position.latitude)
                             intent.putExtra(LONGITUDE, bike.position.longitude)
                             startActivity(intent)
-
                         }
-
                         else {
-
                             val intent = Intent(this, EnterQrCodeActivity::class.java)
                             intent.putExtra(BUNDLE, bundle)
                             intent.putExtra(LATITUDE, bike.position.latitude)
@@ -117,15 +112,15 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         val timer = fragment.findViewById<TextView>(R.id.timer)
 
         reserveBikeButton.setOnClickListener {
-
             dialog.show()
             startStopTimer(timer)
-
+            bikeReserved = true
             db.collection(BIKES).document(bikeId)
                 .update(
                     mapOf(
+                        RESERVED to true,
                         AVAILABLE to false,
-                        CURRENT_USER to currentUser!!.email
+                        CURRENT_USER to currentUser?.email
                     )
                 )
                 .addOnSuccessListener { result ->
@@ -140,41 +135,51 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             val cancelReservationButton = dialog.findViewById<Button>(R.id.cancel_reservation_button)
 
             cancelReservationButton.setOnClickListener {
-                cancelReservation(dialog)
+                db.collection(BIKES).document(bikeId)
+                    .update(
+                        mapOf(
+                            RESERVED to false,
+                            CURRENT_USER to "",
+                            AVAILABLE to true
+                        )
+                    )
+                    .addOnSuccessListener { result ->
+                        Log.d("SUCCESS", "Modified $result")
+                    }
+                    .addOnFailureListener{
+                        Log.d("ERROR", "Modifying bike data failed!")
+                    }
                 bikeReserved = false
+                dialog.dismiss()
             }
-
-
             // Code can only be entered manually
-
             val scanQRCodeButton = dialog.findViewById<Button>(R.id.scan_code_button)
-
             scanQRCodeButton.setOnClickListener {
                 val intent = Intent(this, EnterQrCodeActivity::class.java)
                 intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
             }
-
-
         }
     }
 
     override fun onBackPressed() {
-
         if (!bikeReserved) {
             super.onBackPressed()
         }
         else {
             Toast.makeText(
                 this,
-                "You can't leave this page if you have an ongoing reservation",
+                getString(R.string.stay_on_page),
                 Toast.LENGTH_LONG).show()
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(finishReceiver)
+    }
 
     override fun onMapReady(googleMap: GoogleMap) {
-
         mMap = googleMap
         db.collection(BIKES).document(bikeId)
             .addSnapshotListener { snapshot, e ->
@@ -184,17 +189,14 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
                 }
 
                 if (snapshot != null && snapshot.exists()) {
-
                     bike = snapshot.toObject(Bike::class.java)!!
-
                     val info = findViewById<TextView>(R.id.charge_val_label)
                     info.text = "${bike.charge}"
-
 
                     val position =
                         LatLng(bike.position.latitude, bike.position.longitude)
                     mMap.addMarker(MarkerOptions()
-                        .position(position).title("Bike $bikeId")
+                        .position(position).title("${resources.getString(R.string.bike)} $bikeId")
                         .icon(BitmapDescriptorFactory.defaultMarker(82F)))
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 18F))
 
@@ -204,28 +206,18 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
             }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unregisterReceiver(broadcastReceiver)
-    }
-
     fun startStopTimer(timer: TextView) {
-
         countDownTimer = object : CountDownTimer(timeLeftInMilliSec, 1000) {
             override fun onTick(l: Long) {
                 timeLeftInMilliSec = l
                 timer.text = updateTimer()
-
-
             }
 
             override fun onFinish() {
                 cancelReservation(dialog)
             }
         }.start()
-
     }
-
 
     fun updateTimer(): String {
         val minutes = timeLeftInMilliSec / 60000
@@ -237,22 +229,18 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         if (seconds < 10) {
             sec = "0$sec"
         }
-
         if (minutes < 10) {
             min = "0$min"
         }
-
         timeLeft = "$min : $sec"
         return timeLeft
-
     }
 
     fun cancelReservation(dialog: Dialog) {
-
         dialog.dismiss()
         countDownTimer.cancel()
         timeLeftInMilliSec = MAX_RESERVATION_TIME
-
+        bikeReserved = false
 
         db.collection(BIKES).document(bikeId)
             .update(
@@ -274,8 +262,9 @@ class BikeDetailsActivity : BaseActivity(), OnMapReadyCallback {
         const val BIKES = "bikes"
         const val USERS = "users"
         const val AVAILABLE = "available"
+        const val RESERVED = "reserved"
         const val CURRENT_USER = "current_user"
-        const val FINISH_ACTIVITY_FLAG = "finish_activity"
+        const val FINISH_BIKE_ACTIVITY = "finish_bike_details_activity"
         const val MAX_RESERVATION_TIME = 1800000.toLong()
         const val BUNDLE = "bundle"
         const val LONGITUDE = "longitude"

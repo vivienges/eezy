@@ -56,7 +56,7 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
         setSupportActionBar(toolbar)
         supportActionBar!!.title = resources.getString(R.string.app_name)
 
-        navigationView = findViewById<NavigationView>(R.id.navigationView)
+        navigationView = findViewById(R.id.navigationView)
         navigationView.setNavigationItemSelectedListener(this)
 
         val mDrawerToggle = ActionBarDrawerToggle(this, fullView, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
@@ -71,20 +71,18 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
 
         auth.addAuthStateListener {
 
-            navigationMenu = navigationView.getMenu()
+            navigationMenu = navigationView.menu
 
             if (auth.currentUser != null) {
-                navigationMenu.findItem(R.id.menu_profile).setVisible(true)
-                navigationMenu.findItem(R.id.menu_history).setVisible(true)
-                navigationMenu.findItem(R.id.menu_sign_out).setVisible(true)
-                navigationMenu.findItem(R.id.menu_sign_in).setVisible(false)
+                navigationMenu.findItem(R.id.menu_profile).isVisible = true
+                navigationMenu.findItem(R.id.menu_sign_out).isVisible = true
+                navigationMenu.findItem(R.id.menu_sign_in).isVisible = false
             }
 
             else {
-                navigationMenu.findItem(R.id.menu_profile).setVisible(false)
-                navigationMenu.findItem(R.id.menu_history).setVisible(false)
-                navigationMenu.findItem(R.id.menu_sign_out).setVisible(false)
-                navigationMenu.findItem(R.id.menu_sign_in).setVisible(true)
+                navigationMenu.findItem(R.id.menu_profile).isVisible = false
+                navigationMenu.findItem(R.id.menu_sign_out).isVisible = false
+                navigationMenu.findItem(R.id.menu_sign_in).isVisible = true
             }
 
         }
@@ -123,7 +121,6 @@ abstract class BaseActivity : AppCompatActivity(), NavigationView.OnNavigationIt
        else {
            when(itemId) {
                R.id.menu_profile -> selectedFragment = ProfileFragment()
-               R.id.menu_history -> selectedFragment = HistoryFragment()
                R.id.menu_howtoride -> selectedFragment = HowToRideFragment()
                R.id.menu_help -> selectedFragment = HelpFragment()
            }

@@ -1,5 +1,6 @@
 package com.example.android_project_bike
 
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.content.Intent
 import android.os.Bundle
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -18,56 +19,48 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.content.withStyledAttributes
+import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.*
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
-import java.util.*
-import java.util.jar.Manifest
 import android.location.Location as Location
 
 class MainActivity : BaseActivity(), OnMapReadyCallback {
 
-    private var db = FirebaseFirestore.getInstance()
     private lateinit var auth: FirebaseAuth
     private lateinit var mMap: GoogleMap
-    lateinit var adapter: ArrayAdapter<String>
-    private var idList = mutableListOf<String>()
+    private lateinit var adapter: ArrayAdapter<String>
     private lateinit var listView: ListView
     private lateinit var availability: TextView
-    lateinit var bike: Bike
-    private var loggedIn = false
+    private lateinit var bike: Bike
+    private lateinit var userMarker: Marker
     private lateinit var bikeString: String
-
-    private var locationGPS : Location? = null
-    private var locationNetwork : Location? = null
-    private lateinit var locationManager : LocationManager
+    private lateinit var locationManager: LocationManager
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var db = FirebaseFirestore.getInstance()
+    private var idList = mutableListOf<String>()
+    private var loggedIn = false
+    private var locationGPS: Location? = null
+    private var locationNetwork: Location? = null
     private var hasGPS = false
     private var hasNetwork = false
-    private lateinit var fusedLocationProviderClient : FusedLocationProviderClient
-    private val REQUEST_CODE = 101
-    private lateinit var userMarker : Marker
-
+    private val markers = mutableListOf<Marker>()
+    private val bikes = mutableListOf<Bike>()
 
     override fun attachBaseContext(base: Context) {
         super.attachBaseContext(base)
         MultiDex.install(this)
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
         auth = FirebaseAuth.getInstance()
         bike = Bike()
-        bikeString =  resources.getString(R.string.bike)
+        bikeString = resources.getString(R.string.bike)
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map_fragment) as? SupportMapFragment
@@ -86,179 +79,201 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
 
         listView.adapter = adapter
 
-        var bundle = Bundle()
+        val bundle = Bundle()
 
-        listView.setOnItemClickListener { parent, view, position, id ->
+        listView.setOnItemClickListener { _, _, position, _ ->
 
-            val itemText = listView.getItemAtPosition(position).toString().replace("[^0-9]".toRegex(), "")
+            val itemText =
+                listView.getItemAtPosition(position).toString().replace("[^0-9]".toRegex(), "")
             bundle.putString(BIKE_ID, itemText)
 
-            if (loggedIn != true) {
-
+            if (!loggedIn) {
                 val intent = Intent(this@MainActivity, LoginActivity::class.java)
                 intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
 
             } else {
-
                 val intent = Intent(this@MainActivity, BikeDetailsActivity::class.java)
                 intent.putExtra(BUNDLE, bundle)
                 startActivity(intent)
             }
-
         }
     }
 
-   private fun fetchLocation() {
-
-       if (ActivityCompat.checkSelfPermission(
-               this,
-               "ACCESS_FINE_LOCATION"
-           ) != PackageManager.PERMISSION_GRANTED
-       ) {
-           ActivityCompat.requestPermissions(
-               this,
-               arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
-               REQUEST_CODE
-           )
-
-       } else {
-           Log.d("ERROR", "Permission already granted")
-       }
 
 
-           locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-           hasGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-           hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    private fun checkPermission() {
+        val permissionGranted = ContextCompat.checkSelfPermission(
+            applicationContext, ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
 
-           if (hasGPS || hasNetwork) {
+        if (!permissionGranted) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(ACCESS_FINE_LOCATION),
+                REQUEST_CODE
+            )
+        } else {
+            Log.d("INFO", "Permission already granted")
+        }
+    }
 
-               if (hasGPS) {
-                   locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0F, object:LocationListener {
-                       override fun onLocationChanged(location: Location?) {
-                           if (location != null) {
-                               locationGPS = location
+    private fun fetchLocation() {
+        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        hasGPS = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        hasNetwork = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
 
-                               var userLocation = LatLng(locationGPS!!.latitude, locationGPS!!.longitude)
+        val permissionGranted = ContextCompat.checkSelfPermission(
+            applicationContext, ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
 
-                               if (!::userMarker.isInitialized) {
-                                   userMarker = mMap.addMarker(MarkerOptions()
-                                       .position(userLocation)
-                                       .title("You are here")
-                                       .icon(BitmapDescriptorFactory.defaultMarker(20F))
-                                   )
+        if (permissionGranted) {
+            if ((hasGPS || hasNetwork)) {
+                if (hasGPS) {
+                    var updateMap = true
+                    locationManager.requestLocationUpdates(
+                        LocationManager.GPS_PROVIDER,
+                        5000,
+                        0F,
+                        object : LocationListener {
+                            override fun onLocationChanged(location: Location?) {
+                                if (location != null) {
+                                    locationGPS = location
 
-                               }
-                               else {
-                                   userMarker.position = userLocation
+                                    val userLocation =
+                                        LatLng(locationGPS!!.latitude, locationGPS!!.longitude)
 
-                               }
-                           }
-                       }
+                                    if (!::userMarker.isInitialized) {
+                                        userMarker = mMap.addMarker(
+                                            MarkerOptions()
+                                                .position(userLocation)
+                                                .title("You are here")
+                                                .icon(BitmapDescriptorFactory.defaultMarker(20F))
+                                        )
+                                    } else {
+                                        userMarker.position = userLocation
+                                    }
+                                    if (updateMap) {
+                                        mMap.moveCamera(
+                                            CameraUpdateFactory.newLatLngZoom(
+                                                userMarker.position, 12F
+                                            )
+                                        )
+                                        updateBikes()
+                                        updateMap = false
+                                    }
+                                }
+                            }
 
-                       override fun onStatusChanged(
-                           provider: String?,
-                           status: Int,
-                           extras: Bundle?
-                       ) {
+                            override fun onStatusChanged(
+                                provider: String?,
+                                status: Int,
+                                extras: Bundle?
+                            ) {
+                            }
 
-                       }
+                            override fun onProviderEnabled(provider: String?) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    resources.getString(R.string.provider_enabled),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
 
-                       override fun onProviderEnabled(provider: String?) {
-                           Toast.makeText(this@MainActivity, "The Provider was enabled", Toast.LENGTH_LONG).show()
-                       }
+                            override fun onProviderDisabled(provider: String?) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    resources.getString(R.string.provider_disabled),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                userMarker.remove()
+                            }
+                        })
 
-                       override fun onProviderDisabled(provider: String?) {
-                           Toast.makeText(this@MainActivity, "The Provider was disabled", Toast.LENGTH_LONG).show()
-                           userMarker.remove()
+                    val localGpsLocation =
+                        locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
-                       }
+                    if (localGpsLocation != null) {
+                        locationGPS = localGpsLocation
+                    }
+                }
 
-                   })
+                if (hasNetwork) {
+                    locationManager.requestLocationUpdates(
+                        LocationManager.NETWORK_PROVIDER,
+                        5000,
+                        0F,
+                        object : LocationListener {
+                            override fun onLocationChanged(location: Location?) {
+                                if (location != null) {
+                                    locationNetwork = location
+                                }
+                            }
 
-                   val localGpsLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                            override fun onStatusChanged(
+                                provider: String?,
+                                status: Int,
+                                extras: Bundle?
+                            ) {
+                                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                            }
 
-                   if (localGpsLocation != null) {
-                       locationGPS = localGpsLocation
-                   }
-               }
+                            override fun onProviderEnabled(provider: String?) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    resources.getString(R.string.provider_enabled),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
 
-               if(hasNetwork) {
-                   locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 5000, 0F, object:LocationListener {
-                       override fun onLocationChanged(location: Location?) {
-                           if (location != null) {
-                               locationNetwork = location}
-                       }
+                            override fun onProviderDisabled(provider: String?) {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    resources.getString(R.string.provider_disabled),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                userMarker.remove()
+                            }
+                        })
 
-                       override fun onStatusChanged(
-                           provider: String?,
-                           status: Int,
-                           extras: Bundle?
-                       ) {
-                           TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                       }
+                    val localNetworkLocation =
+                        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
 
-                       override fun onProviderEnabled(provider: String?) {
-                           Toast.makeText(this@MainActivity, "The Provider was enabled", Toast.LENGTH_LONG).show()
-                       }
+                    if (localNetworkLocation != null) {
+                        locationNetwork = localNetworkLocation
+                    }
+                } else if (locationGPS != null && locationNetwork != null) {
+                    if (locationGPS!!.accuracy > locationNetwork!!.accuracy) {
 
-                       override fun onProviderDisabled(provider: String?) {
-                           Toast.makeText(this@MainActivity, "The Provider was disabled", Toast.LENGTH_LONG).show()
-                           userMarker.remove()
-                       }
+                        Log.d("Network", "Network latitude: ${locationNetwork!!.latitude}")
+                        Log.d("Network", "Network longitude: ${locationNetwork!!.longitude}")
+                    } else {
+                        Log.d("GPS", "Network latitude: ${locationGPS!!.latitude}")
+                        Log.d("GPS", "Network longitude: ${locationGPS!!.longitude}")
+                    }
+                }
+            } else {
 
+                val alertTitle = getString(R.string.location_off)
+                val alertMessage = getString(R.string.use_location)
+                val alertYes = getString(R.string.yes)
+                val alertNo = getString(R.string.no)
 
-                   })
-
-                   val localNetworkLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-
-                   if (localNetworkLocation != null) {
-                       locationNetwork = localNetworkLocation
-                   }
-               }
-
-               else if (locationGPS != null && locationNetwork != null) {
-                   if(locationGPS!!.accuracy > locationNetwork!!.accuracy) {
-
-                       Log.d("Network", "Network latitude: ${locationNetwork!!.latitude}")
-                       Log.d("Network", "Network longitude: ${locationNetwork!!.longitude}")
-                   }
-
-                   else {
-                       Log.d("GPS", "Network latitude: ${locationGPS!!.latitude}")
-                       Log.d("GPS", "Network longitude: ${locationGPS!!.longitude}")
-                   }
-               }
-
-           }
-           else {
-
-               val alertTitle = getString(R.string.location_off)
-               val alertMessage = getString(R.string.use_location)
-               val alertYes = getString(R.string.yes)
-               val alertNo = getString(R.string.no)
-
-               AlertDialog.Builder(this)
-                   .setTitle(alertTitle)
-                   .setMessage(alertMessage)
-                   .setPositiveButton(alertYes) {
-                           dialog, whichButton ->
-                       dialog.dismiss()
-
-                       val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                       startActivity(intent)
-
-                   }
-                   .setNegativeButton(alertNo) {
-                           dialog, whichButton ->
-                       dialog.cancel()
-                       dialog.dismiss()
-                   }.show()
-           }
-
-       }
-
-
+                AlertDialog.Builder(this)
+                    .setTitle(alertTitle)
+                    .setMessage(alertMessage)
+                    .setPositiveButton(alertYes) { dialog, whichButton ->
+                        dialog.dismiss()
+                        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                        startActivity(intent)
+                    }
+                    .setNegativeButton(alertNo) { dialog, whichButton ->
+                        dialog.cancel()
+                        dialog.dismiss()
+                    }.show()
+            }
+        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -269,66 +284,76 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
         adapter.notifyDataSetChanged()
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+        checkPermission()
         fetchLocation()
     }
 
-
     override fun onMapReady(googleMap: GoogleMap) {
-
         mMap = googleMap
 
         val jonkoping = LatLng(57.778767, 14.163388)
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(jonkoping, 12F))
 
-        var markers = mutableListOf<Marker>()
+        mMap.setOnCameraMoveListener {
+            updateBikes()
+        }
 
         db.collection(BIKES)
             .addSnapshotListener { snapshots, e ->
                 if (e == null && snapshots != null)
-                //TODO: Add error handling
-                    for (documentChange in snapshots!!.documentChanges) {
+                    for (documentChange in snapshots.documentChanges) {
                         when (documentChange.type) {
                             DocumentChange.Type.ADDED -> {
-
                                 bike = documentChange.document.toObject(Bike::class.java)
+                                bike.id = documentChange.document.id.toInt()
+                                bikes.add(bike)
 
-                                val position = LatLng(bike.position.latitude, bike.position.longitude)
+                                val position =
+                                    LatLng(bike.position.latitude, bike.position.longitude)
 
-
-                                var marker = mMap.addMarker(MarkerOptions()
-                                    .position(position).title("$bikeString ${documentChange.document.id}")
-                                    .icon(BitmapDescriptorFactory.defaultMarker(82F)))
-
+                                val marker = mMap.addMarker(
+                                    MarkerOptions()
+                                        .position(position)
+                                        .title("$bikeString ${bike.id}")
+                                        .icon(BitmapDescriptorFactory.defaultMarker(82F))
+                                )
                                 markers.add(marker)
 
-                                if (bike.available) {
-
-                                    idList.add("$bikeString ${documentChange.document.id}")
-
-                                } else {
-                                    markers.first { it.title == "$bikeString ${documentChange.document.id}" }
+                                if (mMap.projection.visibleRegion.latLngBounds.contains(marker.position) && bike.available) {
+                                    idList.add("$bikeString ${bike.id}")
+                                }
+                                else {
+                                    markers.first { it.title == "$bikeString ${bike.id}" }
                                         .isVisible = false
                                 }
                             }
                             DocumentChange.Type.MODIFIED -> {
-
                                 bike = documentChange.document.toObject(Bike::class.java)
+                                bike.id = documentChange.document.id.toInt()
+                                bikes.remove(bikes.first {it.id == bike.id})
+                                bikes.add(bike)
 
-                                if (bike.available) {
-                                    if (("$bikeString ${documentChange.document.id}") !in idList)
-                                        idList.add("$bikeString ${documentChange.document.id}")
+                                val bikeMarker =
+                                    markers.first { it.title == "$bikeString ${bike.id}" }
 
-                                    markers.first { it.title == "$bikeString ${documentChange.document.id}" }
-                                        .isVisible = true
+                                if (bike.available && mMap.projection.visibleRegion.latLngBounds.contains(
+                                        bikeMarker.position
+                                    )
+                                ) {
+                                    if (("$bikeString ${bike.id}") !in idList)
+                                        idList.add("$bikeString ${bike.id}")
+
+                                    bikeMarker.isVisible = true
 
                                 } else {
-                                    idList.remove("$bikeString ${documentChange.document.id}")
-                                    markers.first { it.title == "$bikeString ${documentChange.document.id}" }
-                                        .isVisible = false
+                                    idList.remove("$bikeString ${bike.id}")
+                                    bikeMarker.isVisible = false
                                 }
+                                bikeMarker.position =
+                                    LatLng(bike.position.latitude, bike.position.longitude)
                             }
                             DocumentChange.Type.REMOVED ->
-                                idList.remove("$bikeString + ${documentChange.document.id}")
+                                idList.remove("$bikeString + ${bike.id}")
                         }
                     }
                 idList.sort()
@@ -342,7 +367,6 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
                     listView.visibility = View.VISIBLE
                 }
             }
-
     }
 
     override fun onRequestPermissionsResult(
@@ -350,16 +374,49 @@ class MainActivity : BaseActivity(), OnMapReadyCallback {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        if(requestCode == REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d("GPS", "We have permission")
+                fetchLocation()
+            }
+        }
+    }
 
-                if ( grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("GPS", "We have permission")
+    private fun updateBikes() {
+        for (bike in bikes) {
+            if (mMap.projection.visibleRegion.latLngBounds.contains(
+                    LatLng(
+                        bike.position.latitude,
+                        bike.position.longitude
+                    )
+                ) && bike.available
+            ) {
+                if("$bikeString ${bike.id}" !in idList) {
+                    idList.add("$bikeString ${bike.id}")
+                    markers.first { it.title == "$bikeString ${bike.id}" }.isVisible = true
+                }
+            }
+            else {
+                markers.first { it.title == "$bikeString ${bike.id}" }.isVisible = false
+                if ("$bikeString ${bike.id}" in idList){
+                    idList.remove("$bikeString ${bike.id}")
                 }
             }
         }
+        idList.sort()
+        adapter.notifyDataSetChanged()
 
+        if (idList.isEmpty()) {
+            availability.visibility = View.VISIBLE
+            listView.visibility = View.GONE
+        } else {
+            availability.visibility = View.GONE
+            listView.visibility = View.VISIBLE
+        }
+    }
 
     companion object {
+        const val REQUEST_CODE = 101
         const val BIKE_ID = "BIKE_ID"
         const val BIKES = "bikes"
         const val BUNDLE = "bundle"
